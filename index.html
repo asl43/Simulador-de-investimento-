@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simulador Avançado de Investimentos — IR e Projeções</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--glass:rgba(255,255,255,0.03);--success:#10b981;--warning:#f59e0b;--danger:#ef4444}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:linear-gradient(180deg,#071023 0%, #0f1724 100%);color:#e6eef6;padding:20px;line-height:1.6}
+    .container{max-width:1200px;margin:0 auto}
+    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+    h1{font-size:22px;font-weight:700;color:var(--accent)}
+    h2{font-size:18px;margin-bottom:12px;color:#e6eef6}
+    h3{font-size:16px;margin-bottom:10px;color:#cbd5e1}
+    .card{background:var(--glass);border-radius:12px;padding:18px;margin-bottom:16px;box-shadow:0 6px 18px rgba(2,6,23,0.6);border:1px solid rgba(255,255,255,0.05)}
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
+    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:#071428;color:#e6eef6;font-size:14px}
+    input:focus,select:focus{outline:none;border-color:var(--accent)}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .controls{display:grid;gap:12px}
+    .row{display:flex;gap:10px;align-items:end}
+    button{background:var(--accent);border:none;padding:11px 16px;border-radius:10px;color:#042f35;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s}
+    button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(6,182,212,0.3)}
+    button:active{transform:translateY(0)}
+    .small-btn{background:rgba(255,255,255,0.1);border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:14px;color:#e6eef6}
+    .small-btn:hover{background:rgba(255,255,255,0.2)}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+    th{background:rgba(6,182,212,0.1);padding:10px 8px;text-align:left;font-weight:600;color:var(--accent);border-bottom:2px solid rgba(6,182,212,0.3)}
+    td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,0.05)}
+    tr:hover{background:rgba(255,255,255,0.02)}
+    .muted{color:var(--muted);font-size:13px}
+    .small{font-size:12px}
+    .right{text-align:right}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .chart-wrap{background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:14px;border-radius:8px;margin-top:10px}
+    .footer{font-size:13px;color:var(--muted);margin-top:16px;text-align:center;padding-top:16px;border-top:1px solid rgba(255,255,255,0.05)}
+    .badge{padding:3px 8px;background:rgba(6,182,212,0.2);border-radius:5px;font-size:11px;font-weight:600;display:inline-block}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:12px}
+    .stat-card{background:rgba(6,182,212,0.05);padding:12px;border-radius:8px;border-left:3px solid var(--accent)}
+    .stat-value{font-size:18px;font-weight:700;color:#e6eef6;margin-top:4px}
+    .tabs{display:flex;gap:8px;margin-bottom:12px;border-bottom:2px solid rgba(255,255,255,0.05)}
+    .tab{padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:500;color:var(--muted);transition:all 0.2s}
+    .tab:hover{color:#e6eef6}
+    .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .projection-table{font-size:12px;max-height:400px;overflow-y:auto}
+    .projection-table th{position:sticky;top:0;background:#0b1220;z-index:10}
+    .highlight{background:rgba(16,185,129,0.1);font-weight:600}
+    @media (max-width:920px){.grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>📊 Simulador Avançado de Investimentos</h1>
+        <div class="muted">Com cálculo de IR, taxas e projeção mensal detalhada</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <div>
+        <section class="card">
+          <h3>➕ Adicionar ativo / fundo</h3>
+          <div class="controls">
+            <div class="row">
+              <div style="flex:2">
+                <label>Símbolo (ex: RZAG11)</label>
+                <input id="symbol" placeholder="RZAG11" />
+              </div>
+              <div style="flex:1">
+                <label>Quantidade</label>
+                <input id="qty" type="number" min="0" step="1" value="1" />
+              </div>
+            </div>
+            <div class="row">
+              <div style="flex:1">
+                <label>Preço por cota (R$)</label>
+                <input id="price" type="number" min="0" step="0.01" value="10.00" />
+              </div>
+              <div style="flex:1">
+                <label>Yield anual (%)</label>
+                <input id="yield" type="number" min="0" step="0.01" value="10.00" />
+              </div>
+              <div style="flex:1">
+                <label>Categoria</label>
+                <select id="category">
+                  <option value="FII">FII</option>
+                  <option value="Ações">Ações</option>
+                  <option value="Renda Fixa">Renda Fixa</option>
+                  <option value="ETF">ETF</option>
+                  <option value="Criptomoedas">Criptomoedas</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label><input type="checkbox" id="irExempt" /> Isento de IR (ex: FIIs, LCI, LCA)</label>
+            </div>
+            <div class="row">
+              <button id="addBtn">➕ Adicionar</button>
+              <button id="presetBtn" style="background:#8b5cf6">🎯 Presets (RZAG11, MXRF11, VSLH11)</button>
+              <button id="clearBtn" style="background:#ef4444">🗑️ Limpar Tudo</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>💼 Carteira de Investimentos</h3>
+          <div style="margin-bottom:10px">
+            <label>Filtrar por categoria:</label>
+            <select id="filterCategory">
+              <option value="">Todas as categorias</option>
+              <option value="FII">FII</option>
+              <option value="Ações">Ações</option>
+              <option value="Renda Fixa">Renda Fixa</option>
+              <option value="ETF">ETF</option>
+              <option value="Criptomoedas">Criptomoedas</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto">
+            <table id="assetsTable">
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Categoria</th>
+                  <th class="right">Qtd</th>
+                  <th class="right">Preço</th>
+                  <th class="right">Investido</th>
+                  <th class="right">%</th>
+                  <th class="right">Yield</th>
+                  <th class="right">Provento/ano</th>
+                  <th class="right">IR</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="muted small">Total Investido</div>
+              <div class="stat-value" id="totalInvest">R$ 0,00</div>
+            </div>
+            <div class="stat-card">
+              <div class="muted small">Proventos/Ano</div>
+              <div class="stat-value" id="totalYield">R$ 0,00</div>
+            </div>
+            <div class="stat-card">
+              <div class="muted small">IR Anual Estimado</div>
+              <div class="stat-value" id="totalIR">R$ 0,00</div>
+            </div>
+            <div class="stat-card">
+              <div class="muted small">Líquido/Ano</div>
+              <div class="stat-value" id="netYield">R$ 0,00</div>
+            </div>
+            <div class="stat-card">
+              <div class="muted small">Yield Médio</div>
+              <div class="stat-value" id="avgYield">0%</div>
+            </div>
+            <div class="stat-card">
+              <div class="muted small">Total de Ativos</div>
+              <div class="stat-value" id="totalAssets">0</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px" class="actions">
+            <button id="saveBtn" style="background:#10b981">💾 Salvar Carteira</button>
+            <button id="exportBtn" style="background:#8b5cf6">📤 Exportar CSV</button>
+            <button id="importBtn" style="background:#3b82f6">📥 Importar CSV</button>
+            <button id="resetStorage" style="background:#f59e0b">⚠️ Apagar Dados Salvos</button>
+          </div>
+          <input type="file" id="importFile" accept=".csv" style="display:none" />
+        </section>
+      </div>
+
+      <aside>
+        <section class="card">
+          <h3>📈 Diversificação da Carteira</h3>
+          <div class="chart-wrap">
+            <canvas id="pieChart" width="360" height="220"></canvas>
+          </div>
+          <div id="categoryBreakdown" style="margin-top:12px;font-size:12px"></div>
+        </section>
+
+        <section class="card">
+          <h3>🎯 Configuração da Simulação</h3>
+          <div class="controls">
+            <div class="row">
+              <div style="flex:1">
+                <label>Horizonte (anos)</label>
+                <select id="years">
+                  <option value="1">1 ano</option>
+                  <option value="3">3 anos</option>
+                  <option value="5" selected>5 anos</option>
+                  <option value="10">10 anos</option>
+                  <option value="15">15 anos</option>
+                  <option value="20">20 anos</option>
+                </select>
+              </div>
+              <div style="flex:1">
+                <label>Aporte mensal (R$)</label>
+                <input type="number" id="monthlyContribution" min="0" step="100" value="500" />
+              </div>
+            </div>
+            <div>
+              <label><input type="checkbox" id="reinvest" checked/> Reinvestir proventos líquidos (após IR)</label>
+            </div>
+            <div>
+              <label><input type="checkbox" id="considerInflation" /> Considerar inflação (IPCA 4,5% a.a.)</label>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('growth')">📊 Crescimento</div>
+            <div class="tab" onclick="switchTab('monthly')">📅 Detalhes Mensais</div>
+          </div>
+
+          <div id="growth-tab" class="tab-content active">
+            <div class="chart-wrap">
+              <canvas id="growthChart" width="400" height="260"></canvas>
+            </div>
+            <div id="projectionSummary" style="margin-top:12px;padding:12px;background:rgba(6,182,212,0.1);border-radius:8px;font-size:13px"></div>
+          </div>
+
+          <div id="monthly-tab" class="tab-content">
+            <div style="overflow-x:auto">
+              <table class="projection-table">
+                <thead>
+                  <tr>
+                    <th>Mês</th>
+                    <th class="right">Patrimônio</th>
+                    <th class="right">Aporte</th>
+                    <th class="right">Proventos</th>
+                    <th class="right">IR</th>
+                    <th class="right">Líquido</th>
+                  </tr>
+                </thead>
+                <tbody id="monthlyProjectionBody"></tbody>
+              </table>
+            </div>
+            <div style="margin-top:10px;padding:10px;background:rgba(16,185,129,0.1);border-radius:6px;font-size:12px" id="monthlyStats"></div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3>💡 Informações sobre IR</h3>
+          <ul class="muted small" style="padding-left:20px">
+            <li>FIIs: isentos de IR sobre proventos</li>
+            <li>Ações: 15% de IR sobre dividendos (geralmente isentos na prática)</li>
+            <li>Renda Fixa: 15% a 22,5% conforme prazo (usando 20% médio)</li>
+            <li>ETFs: seguem mesma regra de ações</li>
+            <li>Este simulador usa 15% como padrão para ativos não isentos</li>
+            <li>Para maior precisão, consulte um contador</li>
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <div class="footer">
+      <strong>Simulador Avançado de Investimentos</strong> — Ferramenta educacional para planejamento financeiro.
+      Não constitui recomendação de investimento. Consulte profissionais certificados para decisões financeiras.
+    </div>
+  </div>
+
+  <script>
+    const $ = id => document.getElementById(id)
+    const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})
+    
+    let assets = []
+    let filterCategory = ''
+    
+    const tbody = document.querySelector('#assetsTable tbody')
+    const totalInvestEl = $('totalInvest')
+    const totalYieldEl = $('totalYield')
+    const totalIREl = $('totalIR')
+    const netYieldEl = $('netYield')
+    const avgYieldEl = $('avgYield')
+    const totalAssetsEl = $('totalAssets')
+    
+    function calculateIR(income, isExempt) {
+      if (isExempt) return 0
+      return income * 0.15 // 15% padrão para dividendos/proventos não isentos
+    }
+    
+    function renderTable() {
+      tbody.innerHTML = ''
+      let totalInvest = 0, totalYield = 0, totalIR = 0
+      const allInvest = assets.reduce((s,a)=>s+a.qty*a.price,0)
+      const filteredAssets = filterCategory ? assets.filter(a => a.category === filterCategory) : assets
+      
+      filteredAssets.forEach((a) => {
+        const invested = a.qty * a.price
+        const provento = invested * (a.yield/100)
+        const ir = calculateIR(provento, a.irExempt)
+        const percentage = allInvest ? (invested / allInvest * 100) : 0
+        totalInvest += invested
+        totalYield += provento
+        totalIR += ir
+        
+        const tr = document.createElement('tr')
+        tr.innerHTML = `
+          <td><strong>${a.symbol}</strong></td>
+          <td><span class="badge">${a.category}</span></td>
+          <td class="right">${a.qty}</td>
+          <td class="right">${currency(a.price)}</td>
+          <td class="right">${currency(invested)}</td>
+          <td class="right">${percentage.toFixed(1)}%</td>
+          <td class="right">${a.yield.toFixed(2)}%</td>
+          <td class="right">${currency(provento)}</td>
+          <td class="right">${a.irExempt ? '<span style="color:#10b981">Isento</span>' : currency(ir)}</td>
+          <td>
+            <button class="small-btn" onclick="editAsset(${assets.indexOf(a)})">✏️</button>
+            <button class="small-btn" onclick="deleteAsset(${assets.indexOf(a)})">🗑️</button>
+          </td>
+        `
+        tbody.appendChild(tr)
+      })
+      
+      const allYield = assets.reduce((s,a)=>s+(a.qty*a.price)*(a.yield/100),0)
+      const allIR = assets.reduce((s,a)=>{
+        const provento = (a.qty*a.price)*(a.yield/100)
+        return s + calculateIR(provento, a.irExempt)
+      },0)
+      const avgYield = allInvest > 0 ? (allYield / allInvest * 100) : 0
+      
+      totalInvestEl.textContent = currency(allInvest)
+      totalYieldEl.textContent = currency(allYield)
+      totalIREl.textContent = currency(allIR)
+      netYieldEl.textContent = currency(allYield - allIR)
+      avgYieldEl.textContent = avgYield.toFixed(2) + '%'
+      totalAssetsEl.textContent = assets.length
+      
+      drawCharts()
+    }
+    
+    function addAsset(symbol, qty, price, yieldPerc, category, irExempt) {
+      if(!symbol) return alert('Preencha o símbolo')
+      assets.push({
+        symbol, 
+        qty:Number(qty), 
+        price:Number(price), 
+        yield:Number(yieldPerc), 
+        category: category || 'Outros',
+        irExempt: Boolean(irExempt)
+      })
+      renderTable()
+    }
+    
+    function editAsset(index) {
+      const a = assets[index]
+      $('symbol').value = a.symbol
+      $('qty').value = a.qty
+      $('price').value = a.price
+      $('yield').value = a.yield
+      $('category').value = a.category
+      $('irExempt').checked = a.irExempt
+      deleteAsset(index)
+    }
+    
+    function deleteAsset(index) {
+      if(confirm(`Remover ${assets[index].symbol}?`)){
+        assets.splice(index, 1)
+        renderTable()
+      }
+    }
+    
+    window.editAsset = editAsset
+    window.deleteAsset = deleteAsset
+    
+    $('addBtn').addEventListener('click', ()=>{
+      addAsset(
+        $('symbol').value.trim().toUpperCase(), 
+        $('qty').value, 
+        $('price').value, 
+        $('yield').value, 
+        $('category').value,
+        $('irExempt').checked
+      )
+      $('symbol').value=''; $('qty').value=1; $('price').value=10.00; $('yield').value=10.00; $('irExempt').checked=false
+    })
+    
+    $('presetBtn').addEventListener('click', ()=>{
+      addAsset('RZAG11', 2, 9.00, 16.4, 'FII', true)
+      addAsset('MXRF11', 1, 9.61, 12.7, 'FII', true)
+      addAsset('VSLH11', 4, 2.50, 13.8, 'FII', true)
+    })
+    
+    $('clearBtn').addEventListener('click', ()=>{
+      if(confirm('Remover TODOS os ativos? Esta ação não pode ser desfeita.')){ 
+        assets = []
+        renderTable() 
+      }
+    })
+    
+    $('saveBtn').addEventListener('click', ()=>{
+      localStorage.setItem('simulator_assets', JSON.stringify(assets))
+      alert('✅ Carteira salva no navegador com sucesso!')
+    })
+    
+    $('resetStorage').addEventListener('click', ()=>{ 
+      if(confirm('Apagar dados salvos permanentemente?')){
+        localStorage.removeItem('simulator_assets')
+        alert('✅ Dados apagados com sucesso')
+      }
+    })
+    
+    function loadSaved(){
+      const raw = localStorage.getItem('simulator_assets')
+      if(raw){ 
+        assets = JSON.parse(raw)
+        renderTable() 
+      }
+    }
+    loadSaved()
+    
+    $('exportBtn').addEventListener('click', ()=>{
+      if(assets.length===0) return alert('Nenhum ativo para exportar')
+      const rows = [['symbol','category','qty','price','yield','irExempt']]
+      assets.forEach(a=>rows.push([a.symbol,a.category,a.qty,a.price,a.yield,a.irExempt]))
+      const csv = rows.map(r=>r.join(',')).join('\n')
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'})
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'carteira_' + new Date().toISOString().split('T')[0] + '.csv'
+      link.click()
+      URL.revokeObjectURL(url)
+    })
+    
+    $('importBtn').addEventListener('click', ()=> $('importFile').click())
+    $('importFile').addEventListener('change', (e)=>{
+      const file = e.target.files[0]
+      if(!file) return
+      const reader = new FileReader()
+      reader.onload = (ev)=>{
+        const lines = ev.target.result.split('\n').filter(l=>l.trim())
+        lines.slice(1).forEach(line=>{
+          const [symbol,category,qty,price,yieldVal,irExempt] = line.split(',')
+          if(symbol && symbol.trim()) {
+            addAsset(symbol.trim(), qty, price, yieldVal, category, irExempt === 'true')
+          }
+        })
+        alert('✅ Carteira importada com sucesso!')
+      }
+      reader.readAsText(file)
+      e.target.value = ''
+    })
+    
+    $('filterCategory').addEventListener('change', (e)=>{
+      filterCategory = e.target.value
+      renderTable()
+    })
+    
+    const chartCanvas = $('growthChart')
+    const pieCanvas = $('pieChart')
+    
+    function drawCharts(){
+      drawGrowthChart()
+      drawPieChart()
+      drawMonthlyProjection()
+    }
+    
+    function drawPieChart(){
+      const ctx = pieCanvas.getContext('2d')
+      ctx.clearRect(0,0,pieCanvas.width, pieCanvas.height)
+      
+      if(assets.length === 0) {
+        ctx.fillStyle = '#94a3b8'
+        ctx.font = '14px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.fillText('Adicione ativos para visualizar', pieCanvas.width/2, pieCanvas.height/2)
+        $('categoryBreakdown').innerHTML = '<div class="muted small">Nenhum ativo adicionado</div>'
+        return
+      }
+      
+      const categories = {}
+      const totalInvest = assets.reduce((s,a)=>s+a.qty*a.price,0)
+      assets.forEach(a=>{
+        const inv = a.qty * a.price
+        categories[a.category] = (categories[a.category]||0) + inv
+      })
+      
+      const colors = ['#06b6d4','#8b5cf6','#f59e0b','#10b981','#ef4444','#ec4899','#6366f1','#14b8a6']
+      let startAngle = -Math.PI/2
+      const centerX = pieCanvas.width/2, centerY = pieCanvas.height/2 - 10, radius = 80
+      
+      Object.entries(categories).forEach(([cat,val], i)=>{
+        const sliceAngle = (val/totalInvest) * 2 * Math.PI
+        ctx.beginPath()
+        ctx.moveTo(centerX, centerY)
+        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle)
+        ctx.closePath()
+        ctx.fillStyle = colors[i % colors.length]
+        ctx.fill()
+        ctx.strokeStyle = '#0b1220'
+        ctx.lineWidth = 2
+        ctx.stroke()
+        startAngle += sliceAngle
+      })
+      
+      const breakdown = $('categoryBreakdown')
+      breakdown.innerHTML = '<div style="display:grid;gap:6px">' + 
+        Object.entries(categories).map(([cat,val],i)=>{
+          const pct = (val/totalInvest*100).toFixed(1)
+          return `<div style="display:flex;align-items:center;gap:10px">
+            <div style="width:16px;height:16px;background:${colors[i%colors.length]};border-radius:3px"></div>
+            <span><strong>${cat}:</strong> ${currency(val)} (${pct}%)</span>
+          </div>`
+        }).join('') + '</div>'
+    }
+    
+    function drawGrowthChart(){
+      const ctx = chartCanvas.getContext('2d')
+      ctx.clearRect(0,0,chartCanvas.width, chartCanvas.height)
+      
+      const years = Number($('years').value)
+      const reinvest = $('reinvest').checked
+      const monthlyAdd = Number($('monthlyContribution').value)
+      const considerInflation = $('considerInflation').checked
+      const inflationRate = 0.045
+      
+      const totalInvest = assets.reduce((s,a)=>s + a.qty*a.price, 0)
+      
+      const weightedYield = assets.length && totalInvest > 0 ? 
+        assets.reduce((s,a)=> {
+          const invested = a.qty*a.price
+          const provento = invested * (a.yield/100)
+          const ir = calculateIR(provento, a.irExempt)
+          const netProvento = provento - ir
+          return s + netProvento
+        }, 0) / totalInvest : 0
+      
+      let points = []
+      let value = totalInvest
+      
+      for(let y=0; y<=years; y++){
+        points.push(Number(value.toFixed(2)))
+        const yearlyDividend = value * weightedYield
+        const yearlyContributions = monthlyAdd * 12
+        
+        if(reinvest){ 
+          value = value + yearlyDividend + yearlyContributions
+        } else { 
+          value = value + yearlyContributions 
+        }
+      }
+      
+      const W = chartCanvas.width, H = chartCanvas.height, PAD = 35
+      ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      ctx.moveTo(PAD, PAD)
+      ctx.lineTo(PAD, H-PAD)
+      ctx.lineTo(W-PAD, H-PAD)
+      ctx.stroke()
+      
+      const maxV = Math.max(...points)
+      const minV = Math.min(...points)
+      
+      ctx.beginPath()
+      points.forEach((p,i)=>{
+        const x = PAD + (i/(points.length-1))*(W-2*PAD)
+        const y = H - PAD - ((p - minV) / (maxV - minV || 1))*(H - 2*PAD)
+        if(i===0) ctx.moveTo(x,y)
+        else ctx.lineTo(x,y)
+      })
+      
+      const gradient = ctx.createLinearGradient(0, 0, 0, H)
+      gradient.addColorStop(0, 'rgba(6,182,212,0.8)')
+      gradient.addColorStop(1, 'rgba(6,182,212,0.3)')
+      ctx.strokeStyle = gradient
+      ctx.lineWidth = 3
+      ctx.stroke()
+      
+      ctx.fillStyle = '#e6eef6'
+      ctx.font='12px sans-serif'
+      points.forEach((p,i)=>{
+        const x = PAD + (i/(points.length-1))*(W-2*PAD)
+        const y = H - PAD - ((p - minV) / (maxV - minV || 1))*(H - 2*PAD)
+        ctx.beginPath()
+        ctx.arc(x, y, 4, 0, Math.PI * 2)
+        ctx.fillStyle = '#06b6d4'
+        ctx.fill()
+        if(i===0 || i===points.length-1 || i === Math.floor(points.length/2)){
+          ctx.fillStyle = '#e6eef6'
+          ctx.fillText(currency(p), x+8, y-8)
+        }
+      })
+      
+      const finalValue = points[points.length-1]
+      const totalContributions = totalInvest + (monthlyAdd * 12 * years)
+      const totalGains = finalValue - totalContributions
+      const gainsPct = totalContributions > 0 ? (totalGains/totalContributions*100) : 0
+      
+      let realValue = finalValue
+      if(considerInflation) {
+        realValue = finalValue / Math.pow(1 + inflationRate, years)
+      }
+      
+      $('projectionSummary').innerHTML = `
+        <strong>📊 Projeção para ${years} ano(s):</strong><br><br>
+        <div style="display:grid;gap:6px">
+          <div>💰 <strong>Valor final:</strong> ${currency(finalValue)}</div>
+          <div>💵 <strong>Total investido:</strong> ${currency(totalContributions)}</div>
+          <div style="color:#10b981">📈 <strong>Ganhos:</strong> ${currency(totalGains)} (${gainsPct.toFixed(1)}%)</div>
+          ${considerInflation ? `<div>🔻 <strong>Valor real (descontando inflação):</strong> ${currency(realValue)}</div>` : ''}
+          <div>📅 <strong>Proventos líquidos mensais (último ano):</strong> ${currency((finalValue * weightedYield) / 12)}</div>
+        </div>
+      `
+    }
+    
+    function drawMonthlyProjection() {
+      const tbody = $('monthlyProjectionBody')
+      tbody.innerHTML = ''
+      
+      const years = Number($('years').value)
+      const reinvest = $('reinvest').checked
+      const monthlyAdd = Number($('monthlyContribution').value)
+      
+      const totalInvest = assets.reduce((s,a)=>s + a.qty*a.price, 0)
+      const weightedYield = assets.length && totalInvest > 0 ? 
+        assets.reduce((s,a)=> {
+          const invested = a.qty*a.price
+          const provento = invested * (a.yield/100)
+          const ir = calculateIR(provento, a.irExempt)
+          const netProvento = provento - ir
+          return s + netProvento
+        }, 0) / totalInvest : 0
+      
+      let patrimony = totalInvest
+      let totalProventos = 0
+      let totalIRPaid = 0
+      let totalAportes = totalInvest
+      
+      const totalMonths = years * 12
+      const showEvery = totalMonths > 60 ? 3 : 1 // Mostrar trimestral se > 5 anos
+      
+      for(let month = 1; month <= totalMonths; month++) {
+        const monthlyProvento = (patrimony * weightedYield) / 12
+        const grossProvento = assets.reduce((s,a)=> {
+          const invested = (patrimony * (a.qty*a.price/totalInvest))
+          return s + (invested * (a.yield/100) / 12)
+        }, 0)
+        const monthlyIR = grossProvento - monthlyProvento
+        
+        patrimony += monthlyAdd
+        totalAportes += monthlyAdd
+        
+        if(reinvest) {
+          patrimony += monthlyProvento
+        }
+        
+        totalProventos += monthlyProvento
+        totalIRPaid += monthlyIR
+        
+        if(month % showEvery === 0 || month === 1 || month === totalMonths) {
+          const tr = document.createElement('tr')
+          const isHighlight = month % 12 === 0 ? ' class="highlight"' : ''
+          tr.innerHTML = `
+            <td${isHighlight}>${month}</td>
+            <td class="right"${isHighlight}>${currency(patrimony)}</td>
+            <td class="right"${isHighlight}>${currency(monthlyAdd)}</td>
+            <td class="right"${isHighlight}>${currency(grossProvento)}</td>
+            <td class="right"${isHighlight}>${currency(monthlyIR)}</td>
+            <td class="right"${isHighlight}>${currency(monthlyProvento)}</td>
+          `
+          tbody.appendChild(tr)
+        }
+      }
+      
+      $('monthlyStats').innerHTML = `
+        <strong>📊 Resumo acumulado (${years} anos):</strong><br>
+        Total de aportes: ${currency(totalAportes)} | 
+        Proventos líquidos: ${currency(totalProventos)} | 
+        IR pago: ${currency(totalIRPaid)} |
+        Patrimônio final: ${currency(patrimony)}
+      `
+    }
+    
+    $('years').addEventListener('change', drawCharts)
+    $('reinvest').addEventListener('change', drawCharts)
+    $('monthlyContribution').addEventListener('input', drawCharts)
+    $('considerInflation').addEventListener('change', drawCharts)
+    
+    function resizeCanvas(){ 
+      chartCanvas.width = Math.min(380, window.innerWidth*0.4)
+      chartCanvas.height = 260
+      pieCanvas.width = Math.min(360, window.innerWidth*0.35)
+      pieCanvas.height = 220
+      drawCharts() 
+    }
+    window.addEventListener('resize', resizeCanvas)
+    resizeCanvas()
+    
+    renderTable()
+    
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'))
+      
+      if(tab === 'growth') {
+        document.querySelector('.tab:nth-child(1)').classList.add('active')
+        $('growth-tab').classList.add('active')
+      } else {
+        document.querySelector('.tab:nth-child(2)').classList.add('active')
+        $('monthly-tab').classList.add('active')
+      }
+    }
+    
+    window.switchTab = switchTab
+  </script>
+</body>
+</html>
