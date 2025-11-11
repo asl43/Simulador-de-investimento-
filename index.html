@@ -90,6 +90,62 @@
     #themeToggle{width:auto;margin-left:10px;padding:8px 12px;background:var(--card);color:var(--text);border:1px solid var(--subtle-border)}
     #themeToggle:hover{filter:none;transform:none;background:var(--glass)}
 
+    /* Estilo do card de Saldo Total Recorrente */
+    #recurrentTotalCard {
+        background: var(--success);
+        color: var(--bg);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+    }
+    #recurrentTotalCard .stat-value {
+        color: var(--bg);
+        font-size: 24px;
+        margin-top: 5px;
+    }
+    
+    /* Estilo para as novas seções de sugestões */
+    .suggestion-list {
+        margin-top: 10px;
+        padding-left: 15px;
+    }
+    .suggestion-item {
+        margin-bottom: 8px;
+        color: var(--text);
+    }
+    .suggestion-item strong {
+        color: var(--accent);
+        font-size: 14px;
+    }
+    .suggestion-item .small {
+        color: var(--muted);
+    }
+    .asset-example {
+        background: var(--input-bg);
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        border: 1px solid var(--subtle-border);
+    }
+    .asset-example button {
+        padding: 5px 8px;
+        font-size: 12px;
+        margin-left: 8px;
+        background: #8b5cf6;
+    }
+    .asset-example span {
+        font-weight: 600;
+    }
+
+
     @media (max-width:920px){.grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:600px){.category-stats-grid{grid-template-columns:1fr 1fr}}
   </style>
@@ -175,34 +231,38 @@
                     <select id="recurrentIncomeType">
                         <option value="Kwai">Monetização Kwai/TikTok</option>
                         <option value="99Pay">Rendimento 99Pay/Mercado Pago</option>
-                        <option value="Outra">Outra Renda Mensal Líquida</option>
+                        <option value="Outra">Outra Renda</option>
                     </select>
                 </div>
                 <div style="flex:1">
-                    <label>Valor Mensal (R$)</label>
-                    <input type="number" id="recurrentMonthlyValue" min="0" step="10" value="50.00" />
+                    <label>Valor Recebido (R$)</label>
+                    <input type="number" id="recurrentValue" min="0.01" step="0.01" value="50.00" />
                 </div>
                 <div style="flex:1">
-                    <label>IR Alíquota (%) (apenas para 99Pay)</label>
-                    <input type="number" id="recurrentIrRate" min="0" max="100" step="1" value="20" />
+                    <label>Data de Recebimento</label>
+                    <input type="date" id="recurrentDate" value="2025-11-10" />
                 </div>
-                <button id="addRecurrentBtn" style="width:auto; margin-top: 10px;">➕ Adicionar Renda</button>
+                <button id="addRecurrentBtn" style="width:auto; margin-top: 10px;">➕ Adicionar Pagamento</button>
             </div>
+
+            <div id="recurrentTotalCard">
+                <div class="muted small" style="color:var(--bg)">SALDO TOTAL ACUMULADO DAS RENDAS</div>
+                <div class="stat-value" id="totalRecurrentIncome">R$ 0,00</div>
+            </div>
+            
             <div style="overflow-x:auto; margin-top:10px;">
                 <table id="recurrentIncomeTable">
                     <thead>
                         <tr>
                             <th>Tipo</th>
-                            <th class="right">Valor Mensal</th>
-                            <th class="right">IR (%)</th>
-                            <th class="right">Líquido Anual</th>
+                            <th class="right">Valor Recebido</th>
+                            <th class="right">Data</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
                 </table>
             </div>
-            <div id="totalRecurrentIncome" style="margin-top:10px; font-weight:600;"></div>
           </div>
         </section>
 
@@ -320,7 +380,64 @@
           </div>
           <div id="categoryBreakdown" style="margin-top:12px;font-size:12px"></div>
         </section>
+        
+        <hr style="border-color:var(--subtle-border);margin:10px 0" />
 
+        <section class="card">
+          <h3>💰 Sugestões de Investimento e Tributação</h3>
+          <p class="muted small">Use seu saldo acumulado para adicionar esses ativos e simular o impacto do IR na carteira.</p>
+          
+          <div id="investmentSuggestions">
+            <div class="asset-example">
+                <span>🏦 **CDB 110% CDI**</span>
+                <span class="muted small">Renda Fixa | IR Regressivo (22.5% a 15%)</span>
+                <button onclick="addExampleAsset('CDB110', 1000, 10, 'Renda Fixa', 13.5)">Adicionar</button>
+            </div>
+            <div class="asset-example">
+                <span>📝 **LCA/LCI 95% CDI**</span>
+                <span class="muted small">Renda Fixa | **Isento**</span>
+                <button onclick="addExampleAsset('LCA95', 1000, 10, 'Renda Fixa', 11.8)">Adicionar</button>
+            </div>
+            <div class="asset-example">
+                <span>📈 **Ação Pagadora (ex: PETR4)**</span>
+                <span class="muted small">Ações | Provento Isento</span>
+                <button onclick="addExampleAsset('PETR4', 1, 35.00, 'Ações', 12.0)">Adicionar</button>
+            </div>
+            <div class="asset-example">
+                <span>🏢 **FII (ex: MXRF11)**</span>
+                <span class="muted small">FII | Provento Isento</span>
+                <button onclick="addExampleAsset('MXRF11', 1, 10.00, 'FII', 12.7)">Adicionar</button>
+            </div>
+            <div class="asset-example">
+                <span>🪙 **Tesouro Selic**</span>
+                <span class="muted small">Renda Fixa | IR Regressivo (22.5% a 15%)</span>
+                <button onclick="addExampleAsset('TSLC', 100, 10, 'Renda Fixa', 12.0)">Adicionar</button>
+            </div>
+          </div>
+        </section>
+        
+        <hr style="border-color:var(--subtle-border);margin:10px 0" />
+        
+        <section class="card">
+            <h3>🚀 Ações e Ideias para Rendas Recorrentes</h3>
+            <p class="muted small">Como aumentar seu saldo (Rendas Recorrentes):</p>
+            <ul class="suggestion-list">
+                <li class="suggestion-item">
+                    <strong>Afiliados Digitais:</strong> Use plataformas como Hotmart para gerar comissões passivas.
+                </li>
+                <li class="suggestion-item">
+                    <strong>Freelancer Recorrente:</strong> Mantenha 1-2 clientes fixos (ex: social media, edição) com contrato mensal.
+                </li>
+                <li class="suggestion-item">
+                    <strong>Aluguel de Bens:</strong> Alugue itens de alto valor ou utilitários (câmera, ferramentas) para terceiros.
+                </li>
+                <li class="suggestion-item">
+                    <strong>Produtos Próprios (E-book):</strong> Crie um produto (e-book, checklist) e venda em plataformas. A receita entra como renda.
+                </li>
+            </ul>
+        </section>
+
+        <hr style="border-color:var(--subtle-border);margin:10px 0" />
 
         <section class="card">
           <div class="tabs">
@@ -384,8 +501,7 @@
           <ul class="muted small" style="padding-left:20px">
             <li>**FIIs e Ações (Dividendos):** Proventos são tratados como isentos no cálculo anual.</li>
             <li>**Renda Fixa:** Alíquota regressiva de 22,5% a 15% conforme a duração em dias informada.</li>
-            <li>**Renda Recorrente (99Pay):** O IR é simulado com a alíquota informada (padrão 20%).</li>
-            <li>**Renda Kwai/Outras:** Tratada como líquido, sem cálculo de IR pelo simulador.</li>
+            <li>**Rendas Recorrentes (Kwai, 99Pay, Outras):** Esses valores são registrados como **entradas de caixa** e não são usados para a projeção de crescimento do *patrimônio investido* (a menos que sejam reinvestidos nos aportes).</li>
           </ul>
         </section>
       </aside>
@@ -399,9 +515,15 @@
   <script>
     const $ = id => document.getElementById(id)
     const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})
+    const formatDate = dateString => {
+        if (!dateString) return 'N/A';
+        const [year, month, day] = dateString.split('-');
+        return `${day}/${month}/${year}`;
+    };
     
     let assets = []
-    let recurrentIncomes = [] // Nova variável para armazenar rendas recorrentes
+    // Estrutura atualizada para Rendas Recorrentes: Array de objetos com { type, value, date }
+    let recurrentIncomes = [] 
     let filterCategory = ''
     let editingIndex = -1 
     
@@ -423,6 +545,9 @@
     const projectedGrossYieldEl = $('projectedGrossYield')
     const projectedIRPaidEl = $('projectedIRPaid')
     const projectedNetYieldEl = $('projectedNetYield')
+    
+    // Elemento do Saldo Total de Rendas
+    const totalRecurrentIncomeEl = $('totalRecurrentIncome')
 
     /*
      * Lógica de Tributação
@@ -450,97 +575,114 @@
         return provento - ir
     }
 
-    // Função para calcular o rendimento líquido anual de uma renda recorrente
-    function getRecurrentNetProvento(r) {
-        if (r.type === '99Pay') {
-            const daysInMonth = 30.41;
-            const grossMonthly = r.value; // Aqui, o 'value' é o ganho diário (0.15), não mensal. Vamos ajustar a lógica para refletir o input atual.
-            // NOVO MODELO: O input 'value' é o valor mensal
-            const irRate = r.irRate / 100;
-            const irMonthly = r.value * irRate;
-            return (r.value - irMonthly) * 12;
-        }
-        // Para Kwai e Outra Renda Líquida
-        return r.value * 12;
+    // Retorna o saldo total das rendas recorrentes (somente o valor)
+    function getTotalRecurrentBalance() {
+        return recurrentIncomes.reduce((sum, r) => sum + r.value, 0);
     }
-    
-    // Calcula o valor líquido ANUAL de uma renda recorrente
-    function calculateRecurrentNetAnnual(type, monthlyValue, irRate) {
-        if (type === '99Pay') {
-            const ir = monthlyValue * (irRate / 100);
-            return (monthlyValue - ir) * 12;
-        }
-        return monthlyValue * 12; // Líquido
-    }
-
-    $('category').addEventListener('change', (e) => {
-      const category = e.target.value
-      if (category === 'Renda Fixa') {
-        rfDurationRow.style.display = 'flex'
-      } else {
-        rfDurationRow.style.display = 'none'
-      }
-      isExemptRow.style.display = 'block'
-    })
     
     // --- Lógica de Rendas Recorrentes ---
     function renderRecurrentTable() {
         recurrentTbody.innerHTML = '';
-        let totalNetAnnual = 0;
+        let totalNetAnnual = 0; // Este campo não é mais usado para o card, mas é mantido para a projeção
         
-        recurrentIncomes.forEach((r, index) => {
-            const typeText = r.type === '99Pay' ? '99Pay/MP (Mensal Bruto)' : r.type;
-            const irText = r.type === '99Pay' ? `${r.irRate}%` : '0%';
-            const netAnnual = calculateRecurrentNetAnnual(r.type, r.value, r.irRate);
-            totalNetAnnual += netAnnual;
+        // Ordena por data mais recente primeiro
+        const sortedRendas = [...recurrentIncomes].sort((a, b) => new Date(b.date) - new Date(a.date));
 
+        sortedRendas.forEach((r, index) => {
             const tr = document.createElement('tr');
+            // Usamos o índice original para a exclusão, mesmo que a exibição esteja ordenada
+            const originalIndex = recurrentIncomes.indexOf(r); 
+
             tr.innerHTML = `
-                <td><strong>${typeText}</strong></td>
+                <td><strong>${r.type}</strong></td>
                 <td class="right">${currency(r.value)}</td>
-                <td class="right">${irText}</td>
-                <td class="right">${currency(netAnnual)}</td>
+                <td class="right">${formatDate(r.date)}</td>
                 <td>
-                    <button class="small-btn" onclick="deleteRecurrent(${index})">🗑️</button>
+                    <button class="small-btn" onclick="deleteRecurrent(${originalIndex})">🗑️</button>
                 </td>
             `;
             recurrentTbody.appendChild(tr);
         });
         
-        $('totalRecurrentIncome').textContent = `Total Líquido Anual de Rendas Recorrentes: ${currency(totalNetAnnual)}`;
-        drawCharts();
+        // Atualiza o Card de Saldo Total
+        totalRecurrentIncomeEl.textContent = currency(getTotalRecurrentBalance());
+        
+        drawCharts(); // Atualiza a projeção
     }
     
     $('addRecurrentBtn').addEventListener('click', () => {
         const type = $('recurrentIncomeType').value;
-        const value = Number($('recurrentMonthlyValue').value);
-        const irRate = Number($('recurrentIrRate').value);
+        const value = Number($('recurrentValue').value);
+        const date = $('recurrentDate').value;
 
-        if (value <= 0) return alert('O valor mensal deve ser maior que zero.');
+        if (value <= 0) return alert('O valor recebido deve ser maior que zero.');
+        if (!date) return alert('Selecione a data de recebimento.');
 
-        // O input 'value' agora representa o valor BRUTO/LÍQUIDO mensal, não o diário.
         const newRecurrent = {
             type,
             value,
-            irRate: type === '99Pay' ? irRate : 0, // IR só é relevante para 99Pay/MP
+            date,
         };
         
         recurrentIncomes.push(newRecurrent);
         renderRecurrentTable();
         
         // Resetar formulário após adição
-        $('recurrentMonthlyValue').value = '50.00';
-        $('recurrentIrRate').value = '20';
-        $('recurrentIncomeType').value = 'Kwai';
+        $('recurrentValue').value = '50.00';
+        $('recurrentDate').value = new Date().toISOString().split('T')[0]; // Volta para data atual
     });
 
     window.deleteRecurrent = function(index) {
-        if (confirm('Remover esta renda recorrente?')) {
+        if (confirm('Remover este pagamento de renda?')) {
             recurrentIncomes.splice(index, 1);
             renderRecurrentTable();
         }
     }
+    // Define a data atual no input de Renda Recorrente ao carregar
+    $('recurrentDate').value = new Date().toISOString().split('T')[0];
+    
     // --- Fim Lógica de Rendas Recorrentes ---
+
+    // --- Lógica de Sugestões de Investimento ---
+    window.addExampleAsset = function(symbol, qty, price, category, yieldPerc, daysHeld = 721) {
+        const isExempt = (category === 'FII' || category === 'Ações' || symbol.includes('LCA') || symbol.includes('LCI'));
+
+        const newAsset = {
+            symbol: symbol, 
+            qty: Number(qty), 
+            price: Number(price), 
+            yield: Number(yieldPerc), 
+            category: category,
+            irExempt: isExempt,
+            daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
+            purchaseDate: new Date().toISOString().split('T')[0]
+        };
+        
+        // Tenta encontrar o CDB/Tesouro para somar, se for o caso
+        let existingIndex = -1;
+        if (category === 'Renda Fixa') {
+            existingIndex = assets.findIndex(a => a.symbol === symbol);
+        } else if (category === 'FII' || category === 'Ações') {
+            existingIndex = assets.findIndex(a => a.symbol === symbol && a.price === price);
+        }
+        
+        if (existingIndex !== -1 && category === 'Renda Fixa') {
+            // Se for Renda Fixa (CDB/Tesouro), soma o valor investido
+            assets[existingIndex].price = ((assets[existingIndex].qty * assets[existingIndex].price) + (newAsset.qty * newAsset.price)) / (assets[existingIndex].qty + newAsset.qty);
+            assets[existingIndex].qty += newAsset.qty;
+            assets[existingIndex].yield = (assets[existingIndex].yield + newAsset.yield) / 2; // Média de yield
+        } else if (existingIndex !== -1 && (category === 'FII' || category === 'Ações')) {
+            // Se for Renda Variável (FII/Ações) no mesmo preço, soma as quantidades
+            assets[existingIndex].qty += newAsset.qty;
+        } else {
+            // Caso contrário, adiciona como novo ativo
+            assets.push(newAsset);
+        }
+
+        renderTable();
+        alert(`✅ Ativo ${symbol} adicionado à sua carteira!`);
+    }
+
     
     function renderCategoryNetStats() {
         const categories = {}
@@ -560,57 +702,74 @@
             totalNetAnnual += netProvento;
         });
 
-        // 2. Adicionar Rendas Recorrentes
-        recurrentIncomes.forEach((r, index) => {
-            const netAnnual = calculateRecurrentNetAnnual(r.type, r.value, r.irRate);
-            const key = `Renda_${r.type}_${index}`; // Chave única para evitar colisão
-            
+        // 2. Coletar dados das Rendas Recorrentes
+        // Como agora as rendas são entradas de caixa com data, a projeção anual fica mais complexa.
+        // Vamos usar uma *média* simples baseada nas entradas dos últimos 12 meses (simulação simplificada).
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        
+        const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
+        const totalLastYear = relevantRendas.reduce((sum, r) => sum + r.value, 0);
+
+        // Agrupamento por tipo (Kwai, 99Pay, Outra) para exibir nos cards.
+        const externalYields = relevantRendas.reduce((acc, r) => {
+            acc[r.type] = (acc[r.type] || 0) + r.value;
+            return acc;
+        }, {});
+        
+        Object.entries(externalYields).forEach(([type, value]) => {
+            const key = `Renda_${type}`;
             categories[key] = {
                 invested: 0, 
-                netYield: netAnnual, 
+                netYield: value, // O valor aqui é o acumulado no último ano
                 isExternal: true, 
-                type: r.type,
-                irRate: r.irRate
+                type: type,
+                label: `Acumulado Últimos 12 meses`
             };
-            totalNetAnnual += netAnnual;
         });
-        
+
         // 3. Adicionar Card Total
         categories['TOTAL_GERAL'] = {
             invested: assets.reduce((s,a)=>s + a.qty*a.price, 0),
-            netYield: totalNetAnnual,
+            netYield: totalNetAnnual, // Este é apenas o provento anual dos ATIVOS
             isExternal: 'total',
-            label: 'Total Líquido Anual'
+            label: 'Total Líquido Anual (Ativos)'
         };
 
         // 4. Renderizar Cards
         let html = '';
         
         Object.entries(categories).forEach(([key, data]) => {
-            if (key === 'TOTAL_GERAL') return; // Renderiza o total por último
+            if (key === 'TOTAL_GERAL') return; 
 
             const isExternal = data.isExternal;
             let title, description, classType = '';
 
             if (isExternal) {
                 classType = 'external-yield';
-                title = data.type === '99Pay' ? '99Pay/MP (Líq)' : data.type;
-                description = data.type === '99Pay' ? `IR ${data.irRate}%` : 'Renda Líquida Mensal';
+                title = data.type;
+                description = data.label;
+                html += `
+                    <div class="category-stat-card ${classType}">
+                        <div class="muted small">Ganho Acumulado (${title})</div>
+                        <div class="stat-value">${currency(data.netYield)}</div>
+                        <div class="muted small">${description}</div>
+                    </div>
+                `;
             } else {
                 title = key;
                 description = `Patrimônio: ${currency(data.invested)}`;
+                html += `
+                    <div class="category-stat-card">
+                        <div class="muted small">Provento Líquido Anual (${title})</div>
+                        <div class="stat-value">${currency(data.netYield)}</div>
+                        <div class="muted small">${description}</div>
+                    </div>
+                `;
             }
-
-            html += `
-                <div class="category-stat-card ${classType}">
-                    <div class="muted small">Ganho Líquido Anual (${title})</div>
-                    <div class="stat-value">${currency(data.netYield)}</div>
-                    <div class="muted small">${description}</div>
-                </div>
-            `;
         });
         
-        // Renderizar Card Total
+        // Renderizar Card Total (Apenas Ativos)
         const totalData = categories['TOTAL_GERAL'];
         html += `
             <div class="category-stat-card total-yield">
@@ -655,7 +814,7 @@
           <td><strong>${a.symbol}</strong></td>
           <td><span class="badge">${a.category}</span></td>
           <td class="right">${a.qty}</td>
-          <td class="right small">${a.purchaseDate}</td>
+          <td class="right small">${formatDate(a.purchaseDate)}</td>
           <td class="right">${currency(invested)}</td>
           <td class="right">${percentage.toFixed(1)}%</td>
           <td class="right">${a.yield.toFixed(2)}%</td>
@@ -705,7 +864,7 @@
         category: category || 'Outros',
         irExempt: Boolean(irExempt),
         daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
-        purchaseDate: purchaseDate // Salva a data de aquisição
+        purchaseDate: purchaseDate 
       }
       
       if(editingIndex !== -1) {
@@ -770,8 +929,11 @@
       assets.push({symbol: 'RZAG11', qty: 2, price: 9.00, yield: 16.4, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2023-11-01'})
       assets.push({symbol: 'MXRF11', qty: 1, price: 9.61, yield: 12.7, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-15'})
       assets.push({symbol: 'VSLH11', qty: 4, price: 2.50, yield: 13.8, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-05-20'})
-      recurrentIncomes.push({ type: 'Kwai', value: 150.00, irRate: 0 })
-      recurrentIncomes.push({ type: '99Pay', value: 300.00, irRate: 20 })
+      // Adicionando rendas recorrentes com datas
+      recurrentIncomes.push({ type: 'Kwai', value: 150.00, date: '2025-10-25' })
+      recurrentIncomes.push({ type: '99Pay', value: 300.00, date: '2025-11-05' })
+      recurrentIncomes.push({ type: 'Kwai', value: 55.00, date: '2025-11-10' })
+
 
       renderTable()
       renderRecurrentTable();
@@ -833,10 +995,10 @@
       assets.forEach(a=>assetRows.push([a.symbol,a.category,a.qty,a.price,a.yield,a.irExempt,a.daysHeld || 0, a.purchaseDate || 'N/A']))
       csv += assetRows.map(r=>r.join(',')).join('\n') + '\n\n'
 
-      // Exportar Rendas Recorrentes
+      // Exportar Rendas Recorrentes (Agora com Data)
       csv += 'Rendas Recorrentes\n'
-      const recurrentRows = [['type','monthly_value','ir_rate']]
-      recurrentIncomes.forEach(r=>recurrentRows.push([r.type, r.value, r.irRate]))
+      const recurrentRows = [['type','value','date']]
+      recurrentIncomes.forEach(r=>recurrentRows.push([r.type, r.value, r.date]))
       csv += recurrentRows.map(r=>r.join(',')).join('\n')
 
       const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'})
@@ -895,12 +1057,12 @@
                       purchaseDate: purchaseDate || 'N/A'
                     });
                 }
-            } else if (inRecurrent && values.length === 3) {
-                const [type, monthlyValue, irRate] = values
+            } else if (inRecurrent && values.length >= 3) { // Agora espera 3 campos
+                const [type, value, date] = values
                 recurrentIncomes.push({
                     type: type,
-                    value: Number(monthlyValue),
-                    irRate: Number(irRate)
+                    value: Number(value),
+                    date: date || new Date().toISOString().split('T')[0]
                 });
             }
         })
@@ -945,19 +1107,16 @@
         const weightedYield = assets.length && totalInvest > 0 ? 
             assets.reduce((s,a)=> s + getAssetNetProvento(a), 0) / totalInvest : 0
         
-        let totalExternalNetMonthly = 0;
-        let totalExternalIRMonthly = 0;
+        // CÁLCULO SIMPLIFICADO: usa a MÉDIA MENSAL dos últimos 12 meses de rendas recorrentes para a projeção
+        const oneYearAgo = new Date();
+        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+        const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
+        const totalLastYear = relevantRendas.reduce((sum, r) => sum + r.value, 0);
+        const monthlyExternalNet = totalLastYear / 12; // Média mensal
 
-        recurrentIncomes.forEach(r => {
-            if (r.type === '99Pay') {
-                const irMonthly = r.value * (r.irRate / 100);
-                totalExternalIRMonthly += irMonthly;
-                totalExternalNetMonthly += r.value - irMonthly;
-            } else {
-                totalExternalNetMonthly += r.value;
-            }
-        });
-
+        // IR de Rendas Recorrentes (Simplificação: tratamos como líquido, IR é 0 para projeção)
+        const totalExternalIRMonthly = 0; 
+        
         let value = totalInvest
         let totalIR = 0
         let barData = [] 
@@ -975,7 +1134,7 @@
                 
                 irYear += irInvestimentos + totalExternalIRMonthly
                 
-                const proventoNetTotal = (proventoBrutoInvest - irInvestimentos) + totalExternalNetMonthly;
+                const proventoNetTotal = (proventoBrutoInvest - irInvestimentos) + monthlyExternalNet;
 
 
                 if(reinvest){ 
@@ -1051,11 +1210,12 @@
       const considerInflation = $('considerInflation').checked
       const inflationRate = 0.045
       
-      let totalExternalNetMonthly = 0;
-      recurrentIncomes.forEach(r => {
-        const irMonthly = r.type === '99Pay' ? r.value * (r.irRate / 100) : 0;
-        totalExternalNetMonthly += r.value - irMonthly;
-      });
+      // Projeção: usa a média mensal das rendas dos últimos 12 meses
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
+      const totalLastYear = relevantRendas.reduce((sum, r) => sum + r.value, 0);
+      const monthlyExternalNet = totalLastYear / 12; // Média mensal
 
       const totalInvest = assets.reduce((s,a)=>s + a.qty*a.price, 0)
       
@@ -1071,7 +1231,7 @@
         
         const yearlyNetDividend = value * weightedYield
         const yearlyContributions = monthlyAdd * 12
-        const yearlyExternalYieldNet = totalExternalNetMonthly * 12
+        const yearlyExternalYieldNet = monthlyExternalNet * 12 // Média anual
         
         if(reinvest){ 
           value = value + yearlyNetDividend + yearlyContributions + yearlyExternalYieldNet
@@ -1096,7 +1256,7 @@
           ${considerInflation ? `<div>🔻 <strong>Valor final (Real):</strong> ${currency(finalRealValue)}</div>` : ''}
           <div>💵 <strong>Total investido (Aportes + Inicial):</strong> ${currency(totalContributions)}</div>
           <div style="color:var(--success)">📈 <strong>Ganhos Nominais:</strong> ${currency(totalGains)} (${gainsPct.toFixed(1)}%)</div>
-          <div>📅 <strong>Proventos líquidos mensais (último ano):</strong> ${currency(totalExternalNetMonthly + (finalValue * weightedYield / 12))}</div>
+          <div>📅 <strong>Proventos líquidos mensais (último ano):</strong> ${currency(monthlyExternalNet + (finalValue * weightedYield / 12))}</div>
           ${considerInflation ? `<div style="font-size:11px; color:var(--muted); margin-top:5px;">*O Valor Real desconta a inflação (IPCA) projetada.</div>` : ''}
         </div>
       `
@@ -1110,25 +1270,16 @@
       const reinvest = $('reinvest').checked
       const monthlyAdd = Number($('monthlyContribution').value)
       
-      // Cálculo das Rendas Recorrentes
-      let totalExternalGrossMonthly = 0;
-      let totalExternalIRMonthly = 0;
-      let totalExternalNetMonthly = 0;
-
-      recurrentIncomes.forEach(r => {
-        let gross = r.value;
-        let ir = 0;
-        let net = gross;
-
-        if (r.type === '99Pay') {
-          ir = gross * (r.irRate / 100);
-          net = gross - ir;
-        } 
-        
-        totalExternalGrossMonthly += gross;
-        totalExternalIRMonthly += ir;
-        totalExternalNetMonthly += net;
-      });
+      // Projeção: usa a média mensal das rendas dos últimos 12 meses
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
+      const totalLastYear = relevantRendas.reduce((sum, r) => sum + r.value, 0);
+      const monthlyExternalNet = totalLastYear / 12; // Média mensal
+      
+      // Como os valores são líquidos, IR é 0.
+      const totalExternalGrossMonthly = monthlyExternalNet; 
+      const totalExternalIRMonthly = 0;
 
       const totalInvest = assets.reduce((s,a)=>s + a.qty*a.price, 0)
       
@@ -1160,7 +1311,7 @@
             });
         }
         
-        // Inclui Rendas Recorrentes
+        // Inclui Rendas Recorrentes (como entrada de caixa líquida)
         const grossProventoTotal = grossProventoInvest + totalExternalGrossMonthly
         const monthlyIRTotal = monthlyIRInvest + totalExternalIRMonthly
         const monthlyProventoNet = grossProventoTotal - monthlyIRTotal 
@@ -1286,8 +1437,8 @@
     $('monthlyContribution').addEventListener('input', drawCharts)
     $('considerInflation').addEventListener('change', drawCharts)
 
-    // Qualquer mudança nas rendas recorrentes deve chamar drawCharts
-    $('recurrentIncomeTable').addEventListener('DOMSubtreeModified', drawCharts);
+    // Qualquer mudança nas rendas recorrentes deve chamar renderRecurrentTable
+    document.querySelector('#recurrentIncomeTable').addEventListener('DOMSubtreeModified', renderRecurrentTable);
     
     function resizeCanvas(){ 
       chartCanvas.width = Math.min(380, window.innerWidth*0.4)
