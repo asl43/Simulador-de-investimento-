@@ -3,295 +3,897 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simulador Financeiro Moderno — Rendas e Investimentos</title>
+  <title>Simulador Financeiro Pro — Rendas e Investimentos</title>
   <style>
-    /* VARIÁVEIS DE TEMA - DARK MODE (Padrão) */
-    :root{
-      --bg:#0f1724;--card:#0b1220;--accent:#06b6d4;--muted:#94a3b8;--glass:rgba(255,255,255,0.03);--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--text:#e6eef6;--subtle-border:rgba(255,255,255,0.05);--input-bg:#071428;--header-bg:linear-gradient(180deg,#071023 0%, #0f1724 100%);--shadow:0 6px 18px rgba(2,6,23,0.6);--secondary-text:#cbd5e1;--highlight-bg:rgba(6,182,212,0.1);--table-header-bg:rgba(6,182,212,0.1);--table-header-border:rgba(6,182,212,0.3);
+    /* VARIÁVEIS DE TEMA - DARK MODE */
+    :root {
+      --bg: #0a0e1a;
+      --bg-secondary: #111827;
+      --card: #1a1f2e;
+      --card-hover: #20253a;
+      --accent: #06b6d4;
+      --accent-hover: #0891b2;
+      --accent-light: rgba(6, 182, 212, 0.1);
+      --success: #10b981;
+      --success-light: rgba(16, 185, 129, 0.1);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-light: rgba(255, 255, 255, 0.05);
+      --input-bg: #0f1419;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.4);
+      --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --gradient-bg: linear-gradient(180deg, #0a0e1a 0%, #111827 100%);
     }
     
     /* VARIÁVEIS DE TEMA - LIGHT MODE */
     [data-theme="light"] {
-      --bg:#f8fafc;--card:#ffffff;--accent:#1d4ed8;--muted:#64748b;--glass:rgba(0,0,0,0.03);--success:#059669;--warning:#d97706;--danger:#dc2626;--text:#1e293b;--subtle-border:rgba(0,0,0,0.1);--input-bg:#f1f5f9;--header-bg:linear-gradient(180deg,#dbeafe 0%, #f8fafc 100%);--shadow:0 4px 12px rgba(30,41,59,0.1);--secondary-text:#334155;--highlight-bg:rgba(29,78,216,0.1);--table-header-bg:rgba(29,78,216,0.1);--table-header-border:rgba(29,78,216,0.3);
+      --bg: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --card: #ffffff;
+      --card-hover: #f8fafc;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --accent-light: rgba(2, 132, 199, 0.1);
+      --success: #059669;
+      --success-light: rgba(5, 150, 105, 0.1);
+      --warning: #d97706;
+      --danger: #dc2626;
+      --text: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --border: rgba(0, 0, 0, 0.1);
+      --border-light: rgba(0, 0, 0, 0.05);
+      --input-bg: #f8fafc;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+      --gradient-primary: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%);
+      --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
+      --gradient-bg: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;background:var(--header-bg);color:var(--text);padding:20px;line-height:1.6;transition:background-color 0.3s, color 0.3s}
-    .container{max-width:1400px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
-    h1{font-size:24px;font-weight:700;color:var(--accent)}
-    h2{font-size:18px;margin-bottom:12px;color:var(--text)}
-    h3{font-size:16px;margin-bottom:12px;color:var(--secondary-text);border-bottom:1px solid var(--subtle-border);padding-bottom:5px;display:flex;align-items:center;gap:8px}
-    .card{background:var(--card);border-radius:14px;padding:20px;margin-bottom:20px;box-shadow:var(--shadow);border:1px solid var(--subtle-border);transition:transform 0.3s}
-    .card:hover{transform:translateY(-2px)}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
-    input,select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--subtle-border);background:var(--input-bg);color:var(--text);font-size:14px;transition:border-color 0.2s, background-color 0.2s}
-    input:focus,select:focus{outline:none;border-color:var(--accent)}
-    .grid{display:grid;grid-template-columns:1fr 450px;gap:20px}
-    .controls{display:grid;gap:15px}
-    .row{display:flex;gap:12px;align-items:end}
-    button{background:var(--accent);border:none;padding:12px 18px;border-radius:10px;color:var(--bg);cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.5px}
-    button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(6,182,212,0.3);filter:brightness(1.1)}
-    [data-theme="light"] button:hover{box-shadow:0 4px 12px rgba(29,78,216,0.3)}
-    button:active{transform:translateY(0)}
-    .small-btn{background:var(--glass);border:none;padding:5px 10px;border-radius:6px;cursor:pointer;font-size:14px;color:var(--text);transition:background 0.2s}
-    .small-btn:hover{background:rgba(255,255,255,0.2)}
-    [data-theme="light"] .small-btn:hover{background:rgba(0,0,0,0.1)}
-    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
-    th{background:var(--table-header-bg);padding:10px 8px;text-align:left;font-weight:600;color:var(--accent);border-bottom:2px solid var(--table-header-border);position:sticky;top:0;z-index:10}
-    td{padding:10px 8px;border-bottom:1px solid var(--subtle-border)}
-    tr:hover{background:var(--glass)}
-    .muted{color:var(--muted);font-size:13px}
-    .small{font-size:12px}
-    .right{text-align:right}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
-    .chart-wrap{background:linear-gradient(180deg,var(--glass),transparent);padding:16px;border-radius:10px;margin-top:15px;position:relative}
-    .footer{font-size:13px;color:var(--muted);margin-top:20px;text-align:center;padding-top:20px;border-top:1px solid var(--subtle-border)}
-    .badge{padding:4px 8px;background:rgba(6,182,212,0.2);border-radius:12px;font-size:11px;font-weight:600;display:inline-block;color:var(--accent)}
-    /* Dashboard de Carteira e Projeção */
-    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;margin-top:15px}
-    .stat-card{background:var(--glass);padding:15px;border-radius:10px;border-left:3px solid var(--accent);box-shadow:var(--shadow)}
-    .stat-value{font-size:20px;font-weight:700;color:var(--text);margin-top:6px}
-    .stat-card-total{background:var(--success);color:var(--bg);border-left:3px solid var(--bg);box-shadow:0 4px 8px rgba(16, 185, 129, 0.4);}
-    .stat-card-total .muted, .stat-card-total .stat-value{color:var(--bg)}
-    .tabs{display:flex;gap:8px;margin-bottom:15px;border-bottom:2px solid var(--subtle-border)}
-    .tab{padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-weight:600;color:var(--muted);transition:all 0.2s}
-    .tab:hover{color:var(--text)}
-    .tab.active{color:var(--accent);border-bottom-color:var(--accent)}
-    .tab-content{display:none}
-    .tab-content.active{display:block}
-    .projection-table{font-size:12px;max-height:400px;overflow-y:auto}
-    .highlight{background:rgba(16,185,129,0.1);font-weight:600}
-    .ir-warning{color:var(--danger);font-weight:600}
-    .ir-exempt{color:var(--success);font-weight:600}
-    .bar-chart-container{height:200px}
-    /* Estilo para cards de categorias */
-    .category-stats-grid{
-        display:grid;
-        grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
-        gap:12px;
-        margin-top:15px;
-        padding:15px;
-        background:var(--input-bg);
-        border-radius:10px;
-        border:1px solid var(--subtle-border);
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    .category-stat-card{
-        padding:12px;
-        border-radius:8px;
-        background:var(--card);
-        border-left:3px solid var(--accent);
-        transition:all 0.2s;
-    }
-    .category-stat-card:hover{transform:scale(1.02);box-shadow:var(--shadow);}
-    .category-stat-card .stat-value{font-size:16px;margin-top:4px;}
-    .category-stat-card .muted{font-size:11px;}
-    .category-stat-card.external-yield{border-left-color: #8b5cf6;}
-    .category-stat-card.total-yield{border-left-color: var(--success); background:var(--highlight-bg);}
 
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gradient-bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
 
-    #themeToggle{width:auto;margin-left:10px;padding:8px 12px;background:var(--card);color:var(--text);border:1px solid var(--subtle-border);transition:all 0.2s;text-transform:none;font-weight:500}
-    #themeToggle:hover{filter:none;transform:none;background:var(--glass);box-shadow:none;}
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px;
+    }
 
-    /* Estilo do card de Saldo Total Recorrente - DESTAQUE MÁXIMO */
-    #recurrentTotalCard {
-        background: linear-gradient(135deg, var(--success), #059669);
-        color: var(--bg);
-        padding: 20px;
-        border-radius: 10px;
-        margin-top: 15px;
-        text-align: center;
-        box-shadow: 0 8px 16px rgba(16, 185, 129, 0.5);
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px;
+      margin-bottom: 24px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      gap: 16px;
+      flex-wrap: wrap;
     }
-    #recurrentTotalCard .stat-value {
-        color: var(--bg);
-        font-size: 32px;
-        margin-top: 8px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    }
-    
-    /* Estilo para as novas seções de sugestões */
-    .suggestion-list {
-        margin-top: 10px;
-        padding-left: 15px;
-    }
-    .suggestion-item {
-        margin-bottom: 8px;
-        color: var(--text);
-    }
-    .suggestion-item strong {
-        color: var(--accent);
-        font-size: 14px;
-        font-weight: 600;
-    }
-    .suggestion-item .small {
-        color: var(--muted);
-    }
-    .asset-example {
-        background: var(--input-bg);
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 8px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 13px;
-        border: 1px solid var(--subtle-border);
-        transition:all 0.2s;
-    }
-    .asset-example:hover{border-color:var(--accent)}
-    .asset-example button {
-        padding: 6px 10px;
-        font-size: 12px;
-        margin-left: 8px;
-        background: #8b5cf6;
-        transition:all 0.2s;
-    }
-    .asset-example span {
-        font-weight: 600;
-    }
-    
-    .icon { margin-right: 8px; }
 
-    /* RESPONSIVIDADE */
-    @media (max-width:1100px){.grid{grid-template-columns:1fr 380px}}
-    @media (max-width:920px){.grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,1fr)}}
-    @media (max-width:600px){
-        .container{padding:10px}
-        h1{font-size:20px}
-        .row{flex-direction:column;gap:10px;align-items:stretch}
-        button{width:100%;margin-top:0}
-        .controls > .row > div{width:100% !important; flex: none !important;}
-        .category-stats-grid{grid-template-columns:1fr}
-        .projection-table{max-height:300px}
-        header{flex-direction:column;align-items:flex-start}
-        #themeToggle{margin-left:0; margin-top:10px}
+    .header-content h1 {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .theme-toggle {
+      padding: 10px 20px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle:hover {
+      background: var(--card-hover);
+      transform: translateY(-1px);
+    }
+
+    /* GRID LAYOUT */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 24px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .card-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .card-icon {
+      font-size: 24px;
+    }
+
+    /* FORM CONTROLS */
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--card);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      font-family: inherit;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-success {
+      background: var(--gradient-success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .btn-icon {
+      padding: 8px 12px;
+      font-size: 16px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-icon:hover {
+      background: var(--card-hover);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* STATS CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: var(--input-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent);
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .stat-card-highlight {
+      background: var(--gradient-success);
+      color: white;
+      border-left-color: white;
+    }
+
+    .stat-card-highlight .stat-label,
+    .stat-card-highlight .stat-value {
+      color: white;
+    }
+
+    /* TABLE */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: var(--input-bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th {
+      padding: 14px 12px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-secondary);
+    }
+
+    tbody tr {
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: var(--card-hover);
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .badge-success {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tab:hover {
+      color: var(--text);
+      background: var(--card-hover);
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SUGGESTIONS */
+    .suggestion-card {
+      background: var(--input-bg);
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border-light);
+      transition: all 0.2s;
+    }
+
+    .suggestion-card:hover {
+      border-color: var(--accent);
+      background: var(--card-hover);
+    }
+
+    .suggestion-content {
+      flex: 1;
+    }
+
+    .suggestion-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .suggestion-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* BALANCE CARD */
+    .balance-card {
+      background: var(--gradient-success);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4);
+      margin-top: 20px;
+    }
+
+    .balance-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .balance-value {
+      font-size: 36px;
+      font-weight: 900;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* CHART CONTAINER */
+    .chart-container {
+      background: var(--input-bg);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      border: 1px solid var(--border-light);
+    }
+
+    /* CATEGORY STATS */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      background: var(--input-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      margin-top: 16px;
+    }
+
+    .category-card {
+      padding: 16px;
+      border-radius: 10px;
+      background: var(--card);
+      border-left: 4px solid var(--accent);
+      transition: all 0.2s;
+    }
+
+    .category-card:hover {
+      transform: scale(1.02);
+      box-shadow: var(--shadow);
+    }
+
+    .category-card-external {
+      border-left-color: #8b5cf6;
+    }
+
+    .category-card-total {
+      background: var(--accent-light);
+      border-left-color: var(--success);
+    }
+
+    /* CHECKBOX GROUP */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: var(--input-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .checkbox-group:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+    }
+
+    .checkbox-group label {
+      cursor: pointer;
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      .main-grid {
+        grid-template-columns: 1fr 420px;
+      }
+    }
+
+    @media (max-width: 968px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app-container {
+        padding: 12px;
+      }
+
+      .header {
+        padding: 16px;
+      }
+
+      .header-content h1 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .stat-value {
+        font-size: 20px;
+      }
+
+      .balance-value {
+        font-size: 28px;
+      }
+
+      .tabs {
+        overflow-x: auto;
+      }
+
+      .tab {
+        white-space: nowrap;
+      }
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--input-bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* ANIMATIONS */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      animation: slideIn 0.4s ease-out;
+    }
+
+    /* LOADING STATE */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div>
-        <h1><span class="icon">🚀</span> Simulação Financeira Pessoal</h1>
-        <div class="muted">Gestão de Rendas Recorrentes, Carteira de Investimentos e Projeções</div>
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-content">
+        <h1>
+          <span class="card-icon">🚀</span>
+          Simulador Financeiro Pro
+        </h1>
+        <p class="header-subtitle">Gestão Completa de Rendas e Investimentos</p>
       </div>
-      <button id="themeToggle">🌓 Alternar Tema</button>
+      <button class="theme-toggle" id="themeToggle">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Modo Escuro</span>
+      </button>
     </header>
 
-    <div class="grid">
+    <div class="main-grid">
+      <!-- LEFT COLUMN -->
       <div>
+        <!-- ASSET FORM -->
         <section class="card">
-          <h3 id="assetFormTitle"><span class="icon">➕</span> Adicionar Ativo / Fundo</h3>
-          <div class="controls">
-            <div class="row">
-              <div style="flex:2">
-                <label>Símbolo (ex: RZAG11)</label>
-                <input id="symbol" placeholder="RZAG11" />
+          <div class="card-header">
+            <span class="card-icon">➕</span>
+            <h2 id="formTitle">Adicionar Ativo</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Símbolo</label>
+                <input id="symbol" placeholder="Ex: RZAG11" />
               </div>
-              <div style="flex:1">
+              <div class="form-group">
                 <label>Quantidade</label>
                 <input id="qty" type="number" min="1" step="1" value="1" />
               </div>
-              <div style="flex:1">
-                <label>Data de Aquisição</label>
-                <input id="purchaseDate" type="date" value="2025-01-01" />
-              </div>
-            </div>
-            <div class="row">
-              <div style="flex:1">
-                <label>Preço por cota (R$)</label>
+              <div class="form-group">
+                <label>Preço (R$)</label>
                 <input id="price" type="number" min="0.01" step="0.01" value="10.00" />
               </div>
-              <div style="flex:1">
-                <label>Yield anual (%)</label>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Yield Anual (%)</label>
                 <input id="yield" type="number" min="0" step="0.01" value="10.00" />
               </div>
-              <div style="flex:1">
+              <div class="form-group">
                 <label>Categoria</label>
                 <select id="category">
                   <option value="FII">FII (Provento Isento)</option>
-                  <option value="Ações">Ações (Provento Isento/Ganhos Tributáveis)</option>
-                  <option value="Renda Fixa">Renda Fixa (Tributação Regressiva)</option>
-                  <option value="ETF">ETF (Provento/Ganhos Tributáveis)</option>
+                  <option value="Ações">Ações (Provento Isento)</option>
+                  <option value="Renda Fixa">Renda Fixa (IR Regressivo)</option>
+                  <option value="ETF">ETF</option>
                   <option value="Criptomoedas">Criptomoedas</option>
                   <option value="Outros">Outros</option>
                 </select>
               </div>
-            </div>
-            
-            <div id="irOptions">
-              <div class="row" id="rfDurationRow" style="display:none;">
-                <div style="flex:1">
-                  <label>Duração (dias) - Para Renda Fixa</label>
-                  <input id="daysHeld" type="number" min="1" value="721" placeholder="Ex: 721 dias para 15%" />
-                </div>
-              </div>
-              <div id="isExemptRow">
-                <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="irExempt" style="width:auto;"/> Marcar como Isento de IR (Anula regras automáticas)</label>
+              <div class="form-group">
+                <label>Data de Aquisição</label>
+                <input id="purchaseDate" type="date" />
               </div>
             </div>
-            
-            <div class="row" style="margin-top:10px;">
-              <button id="addBtn">➕ ADICIONAR ATIVO</button>
-              <button id="updateBtn" style="background:var(--success); display:none;">✏️ ATUALIZAR</button>
-              <button id="presetBtn" style="background:#8b5cf6">🎯 PRESETS</button>
-              <button id="clearBtn" style="background:#ef4444">🗑️ LIMPAR</button>
+
+            <div id="rfDurationRow" style="display:none">
+              <div class="form-group">
+                <label>Duração (dias) - Renda Fixa</label>
+                <input id="daysHeld" type="number" min="1" value="721" placeholder="Ex: 721 dias para 15%" />
+              </div>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="irExempt" />
+              <label for="irExempt">Marcar como Isento de IR</label>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-primary" id="addBtn">
+                ➕ ADICIONAR
+              </button>
+              <button class="btn btn-success" id="updateBtn" style="display:none">
+                ✓ ATUALIZAR
+              </button>
+              <button class="btn btn-secondary" id="presetBtn">
+                🎯 EXEMPLOS
+              </button>
+              <button class="btn btn-danger" id="clearBtn">
+                🗑️ LIMPAR
+              </button>
             </div>
           </div>
         </section>
 
+        <!-- RECURRENT INCOME -->
         <section class="card">
-          <h3><span class="icon">💵</span> Gerenciar Rendas Recorrentes (Acúmulo)</h3>
-          <div class="controls">
-            <div class="row">
-                <div style="flex:1.5">
-                    <label>Tipo de Renda</label>
-                    <select id="recurrentIncomeType">
-                        <option value="Kwai/TikTok">Monetização Kwai/TikTok</option>
-                        <option value="99Pay">Rendimento 99Pay/Mercado Pago</option>
-                        <option value="Afiliados">Afiliados/Comissões</option>
-                        <option value="Freelancer">Serviço Freelancer</option>
-                        <option value="Outra">Outra Renda</option>
-                    </select>
-                </div>
-                <div style="flex:1">
-                    <label>Valor Recebido (R$)</label>
-                    <input type="number" id="recurrentValue" min="0.01" step="0.01" value="50.00" />
-                </div>
-                <div style="flex:1">
-                    <label>Data de Recebimento</label>
-                    <input type="date" id="recurrentDate" value="2025-11-10" />
-                </div>
-                <button id="addRecurrentBtn" style="width:auto; margin-top: 0; padding: 10px 15px;">➕ REGISTRAR</button>
+          <div class="card-header">
+            <span class="card-icon">💵</span>
+            <h2>Rendas Recorrentes</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tipo de Renda</label>
+                <select id="recurrentIncomeType">
+                  <option value="Kwai/TikTok">Monetização Kwai/TikTok</option>
+                  <option value="99Pay">Rendimento 99Pay/Mercado Pago</option>
+                  <option value="Afiliados">Afiliados/Comissões</option>
+                  <option value="Freelancer">Serviço Freelancer</option>
+                  <option value="Outra">Outra Renda</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Valor (R$)</label>
+                <input type="number" id="recurrentValue" min="0.01" step="0.01" value="50.00" />
+              </div>
+              <div class="form-group">
+                <label>Data</label>
+                <input type="date" id="recurrentDate" />
+              </div>
             </div>
 
-            <div id="recurrentTotalCard">
-                <div class="muted small" style="color:var(--bg)">SALDO TOTAL ACUMULADO PARA INVESTIMENTO</div>
-                <div class="stat-value" id="totalRecurrentIncome">R$ 0,00</div>
+            <button class="btn btn-primary" id="addRecurrentBtn">
+              ➕ REGISTRAR RENDA
+            </button>
+
+            <div class="balance-card">
+              <div class="balance-label">💰 Saldo Total Acumulado</div>
+              <div class="balance-value" id="totalRecurrentIncome">R$ 0,00</div>
             </div>
-            
-            <div style="overflow-x:auto; margin-top:15px;">
-                <table id="recurrentIncomeTable">
-                    <thead>
-                        <tr>
-                            <th>Tipo</th>
-                            <th class="right">Valor Recebido</th>
-                            <th class="right">Data</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
+
+            <div class="table-container">
+              <table id="recurrentIncomeTable">
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th class="text-right">Valor</th>
+                    <th class="text-right">Data</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
             </div>
           </div>
         </section>
 
-
+        <!-- PORTFOLIO -->
         <section class="card">
-          <h3><span class="icon">💼</span> Carteira de Investimentos</h3>
-          <div style="margin-bottom:15px; display:flex; gap:10px; align-items:center;">
-            <label style="margin-bottom:0; flex-shrink:0;">Filtrar:</label>
+          <div class="card-header">
+            <span class="card-icon">💼</span>
+            <h2>Carteira de Investimentos</h2>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label>Filtrar por Categoria</label>
             <select id="filterCategory">
               <option value="">Todas as categorias</option>
               <option value="FII">FII</option>
@@ -302,18 +904,19 @@
               <option value="Outros">Outros</option>
             </select>
           </div>
-          <div style="overflow-x:auto">
+
+          <div class="table-container">
             <table id="assetsTable">
               <thead>
                 <tr>
                   <th>Ativo</th>
                   <th>Categoria</th>
-                  <th class="right">Qtd</th>
-                  <th class="right">Investido</th>
-                  <th class="right">% Crt.</th>
-                  <th class="right">Yield</th>
-                  <th class="right">Provento Líq./ano</th>
-                  <th class="right">IR Est.</th>
+                  <th class="text-right">Qtd</th>
+                  <th class="text-right">Investido</th>
+                  <th class="text-right">% Port.</th>
+                  <th class="text-right">Yield</th>
+                  <th class="text-right">Prov. Líq./ano</th>
+                  <th class="text-right">IR</th>
                   <th>Ações</th>
                 </tr>
               </thead>
@@ -323,45 +926,57 @@
 
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="muted small">Total Investido</div>
+              <div class="stat-label">Total Investido</div>
               <div class="stat-value" id="totalInvest">R$ 0,00</div>
             </div>
             <div class="stat-card">
-              <div class="muted small">Proventos Brutos/Ano</div>
+              <div class="stat-label">Proventos Brutos/Ano</div>
               <div class="stat-value" id="totalYield">R$ 0,00</div>
             </div>
             <div class="stat-card">
-              <div class="muted small">IR Anual Estimado</div>
+              <div class="stat-label">IR Anual Estimado</div>
               <div class="stat-value" id="totalIR">R$ 0,00</div>
             </div>
-            <div class="stat-card stat-card-total">
-              <div class="muted small">Provento Líquido Anual (Ativos)</div>
+            <div class="stat-card stat-card-highlight">
+              <div class="stat-label">Provento Líquido Anual</div>
               <div class="stat-value" id="netYield">R$ 0,00</div>
             </div>
           </div>
 
-          <h3 style="margin-top:25px; border-bottom:none; padding-bottom:0;"><span class="icon">📊</span> Dashboard de Ganhos</h3>
-          <div class="muted small" style="margin-bottom:10px;">Rendimento líquido por categoria de ativos e o acumulado das Rendas Recorrentes.</div>
-          <div id="categoryNetStats" class="category-stats-grid">
-            </div>
-
-          <div class="actions">
-            <button id="saveBtn" style="background:#10b981">💾 SALVAR</button>
-            <button id="exportBtn" style="background:#8b5cf6">📤 EXPORTAR</button>
-            <button id="importBtn" style="background:#3b82f6">📥 IMPORTAR</button>
-            <button id="resetStorage" style="background:#f59e0b">⚠️ APAGAR DADOS</button>
+          <div class="card-header" style="margin-top:32px; border-bottom:none; padding-bottom:0">
+            <span class="card-icon">📊</span>
+            <h2>Dashboard de Ganhos</h2>
           </div>
+          <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px">
+            Rendimento líquido por categoria de ativos e rendas recorrentes acumuladas
+          </p>
+
+          <div id="categoryNetStats" class="category-grid"></div>
+
+          <div class="btn-group" style="margin-top:24px">
+            <button class="btn btn-success" id="saveBtn">💾 SALVAR</button>
+            <button class="btn btn-secondary" id="exportBtn">📤 EXPORTAR</button>
+            <button class="btn btn-primary" id="importBtn">📥 IMPORTAR</button>
+            <button class="btn btn-warning" id="resetStorage">⚠️ APAGAR DADOS</button>
+          </div>
+          <input type="file" id="importFile" accept=".csv" style="display:none" />
           <input type="file" id="importFile" accept=".csv" style="display:none" />
         </section>
       </div>
 
+      <!-- RIGHT COLUMN -->
       <aside>
+        <!-- SIMULATION CONFIG -->
         <section class="card">
-          <h3><span class="icon">🎯</span> Configuração da Simulação</h3>
-          <div class="controls">
-            <div class="row">
-              <div style="flex:1">
-                <label>Horizonte (anos)</label>
+          <div class="card-header">
+            <span class="card-icon">🎯</span>
+            <h2>Configuração da Simulação</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Horizonte</label>
                 <select id="years">
                   <option value="1">1 ano</option>
                   <option value="3">3 anos</option>
@@ -371,910 +986,1621 @@
                   <option value="20">20 anos</option>
                 </select>
               </div>
-              <div style="flex:1">
-                <label>Aporte mensal (R$)</label>
+              <div class="form-group">
+                <label>Aporte Mensal (R$)</label>
                 <input type="number" id="monthlyContribution" min="0" step="100" value="500" />
               </div>
             </div>
 
-            <div>
-              <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="reinvest" checked style="width:auto;"/> Reinvestir proventos líquidos (Ativos + Rendas Recorrentes)</label>
+            <div class="checkbox-group">
+              <input type="checkbox" id="reinvest" checked />
+              <label for="reinvest">Reinvestir proventos líquidos</label>
             </div>
-            <div>
-              <label style="display:flex; align-items:center; gap:5px;"><input type="checkbox" id="considerInflation" style="width:auto;"/> Considerar inflação (IPCA 4,5% a.a.)</label>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="considerInflation" />
+              <label for="considerInflation">Considerar inflação (IPCA 4,5% a.a.)</label>
             </div>
           </div>
         </section>
-        
+
+        <!-- INVESTMENT SUGGESTIONS -->
         <section class="card">
-            <h3><span class="icon">💰</span> Sugestões Rápidas de Investimento</h3>
-            <p class="muted small" style="margin-bottom:10px;">Adicione esses ativos de exemplo para simular o efeito da tributação na sua carteira:</p>
-            
-            <div id="investmentSuggestions">
-                <div class="asset-example">
-                    <span>🏦 **CDB 110% CDI**</span>
-                    <span class="muted small">Renda Fixa | IR Regressivo (22.5% a 15%)</span>
-                    <button onclick="addExampleAsset('CDB110', 1000, 1, 'Renda Fixa', 13.5)">ADICIONAR</button>
-                </div>
-                <div class="asset-example">
-                    <span>📝 **LCA/LCI (Isento)**</span>
-                    <span class="muted small">Renda Fixa | **Isento de IR**</span>
-                    <button onclick="addExampleAsset('LCA95', 1000, 1, 'Renda Fixa', 11.8)">ADICIONAR</button>
-                </div>
-                <div class="asset-example">
-                    <span>📈 **Ação Pagadora (PETR4)**</span>
-                    <span class="muted small">Ações | Provento Isento</span>
-                    <button onclick="addExampleAsset('PETR4', 1, 35.00, 'Ações', 12.0)">ADICIONAR</button>
-                </div>
-                <div class="asset-example">
-                    <span>🏢 **FII (MXRF11)**</span>
-                    <span class="muted small">FII | Provento Isento</span>
-                    <button onclick="addExampleAsset('MXRF11', 1, 10.00, 'FII', 12.7)">ADICIONAR</button>
-                </div>
+          <div class="card-header">
+            <span class="card-icon">💡</span>
+            <h2>Sugestões de Investimento</h2>
+          </div>
+
+          <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px">
+            Adicione exemplos para simular diferentes estratégias:
+          </p>
+
+          <div id="investmentSuggestions">
+            <div class="suggestion-card">
+              <div class="suggestion-content">
+                <div class="suggestion-title">🏦 CDB 110% CDI</div>
+                <div class="suggestion-desc">Renda Fixa • IR Regressivo (22.5% → 15%)</div>
+              </div>
+              <button class="btn btn-secondary" onclick="addExample('CDB110', 1000, 1, 'Renda Fixa', 13.5, 721)">
+                ADICIONAR
+              </button>
             </div>
+
+            <div class="suggestion-card">
+              <div class="suggestion-content">
+                <div class="suggestion-title">📝 LCA/LCI (Isento)</div>
+                <div class="suggestion-desc">Renda Fixa • Isento de IR</div>
+              </div>
+              <button class="btn btn-secondary" onclick="addExample('LCA95', 1000, 1, 'Renda Fixa', 11.8, 0, true)">
+                ADICIONAR
+              </button>
+            </div>
+
+            <div class="suggestion-card">
+              <div class="suggestion-content">
+                <div class="suggestion-title">📈 Ação PETR4</div>
+                <div class="suggestion-desc">Ações • Provento Isento</div>
+              </div>
+              <button class="btn btn-secondary" onclick="addExample('PETR4', 1, 35.00, 'Ações', 12.0)">
+                ADICIONAR
+              </button>
+            </div>
+
+            <div class="suggestion-card">
+              <div class="suggestion-content">
+                <div class="suggestion-title">🏢 FII MXRF11</div>
+                <div class="suggestion-desc">FII • Provento Isento</div>
+              </div>
+              <button class="btn btn-secondary" onclick="addExample('MXRF11', 1, 10.00, 'FII', 12.7)">
+                ADICIONAR
+              </button>
+            </div>
+          </div>
         </section>
 
+        <!-- INCOME IDEAS -->
         <section class="card">
-            <h3><span class="icon">💡</span> Ideias para Rendas Recorrentes</h3>
-            <p class="muted small">Busque essas fontes para aumentar o seu Saldo Total Acumulado:</p>
-            <ul class="suggestion-list">
-                <li class="suggestion-item">
-                    <strong>Gestão de Redes:</strong> Ofereça pacotes mensais de serviços de social media para pequenos comércios.
-                </li>
-                <li class="suggestion-item">
-                    <strong>Afiliados + Tráfego Pago:</strong> Use anúncios pagos para escalar a venda dos seus links de afiliados.
-                </li>
-                <li class="suggestion-item">
-                    <strong>Cursos/E-books:</strong> Venda um guia rápido sobre como replicar sua monetização no Kwai.
-                </li>
-            </ul>
+          <div class="card-header">
+            <span class="card-icon">💰</span>
+            <h2>Ideias de Renda Extra</h2>
+          </div>
+
+          <div style="display:grid; gap:16px">
+            <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--accent)">
+              <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                🎨 Gestão de Redes Sociais
+              </div>
+              <div style="font-size:13px; color:var(--text-muted)">
+                Pacotes mensais para pequenos negócios
+              </div>
+            </div>
+
+            <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--success)">
+              <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                📱 Afiliados + Tráfego Pago
+              </div>
+              <div style="font-size:13px; color:var(--text-muted)">
+                Escale vendas com anúncios direcionados
+              </div>
+            </div>
+
+            <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--warning)">
+              <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                📚 Cursos e E-books
+              </div>
+              <div style="font-size:13px; color:var(--text-muted)">
+                Monetize seu conhecimento digital
+              </div>
+            </div>
+          </div>
         </section>
 
+        <!-- PROJECTION TABS -->
         <section class="card">
           <div class="tabs">
             <div class="tab active" onclick="switchTab('growth')">📊 Crescimento</div>
-            <div class="tab" onclick="switchTab('monthly')">📅 Detalhes Mensais</div>
+            <div class="tab" onclick="switchTab('monthly')">📅 Detalhes</div>
           </div>
 
+          <!-- GROWTH TAB -->
           <div id="growth-tab" class="tab-content active">
-            <h4 style="color:var(--text); margin-bottom:10px; font-size:16px;">Projeção Final (${$('years').value} Anos)</h4>
-            <div class="stats-grid" style="margin-bottom:15px; grid-template-columns:1fr 1fr">
-              <div class="stat-card" style="border-left-color: var(--accent);">
-                <div class="muted small">Patrimônio Final Estimado</div>
+            <h3 style="color:var(--text); font-size:18px; font-weight:700; margin-bottom:16px">
+              Projeção Final (<span id="yearsDisplay">5</span> Anos)
+            </h3>
+
+            <div class="stats-grid" style="grid-template-columns:1fr 1fr">
+              <div class="stat-card">
+                <div class="stat-label">Patrimônio Final</div>
                 <div class="stat-value" id="projectedNetYield">R$ 0,00</div>
               </div>
-              <div class="stat-card" style="border-left-color: var(--success);">
-                <div class="muted small">Ganhos Totais (Nominal)</div>
+              <div class="stat-card" style="border-left-color:var(--success)">
+                <div class="stat-label">Ganhos Totais</div>
                 <div class="stat-value" id="projectedGrossYield">R$ 0,00</div>
               </div>
-              <div class="stat-card" style="border-left-color: var(--danger);">
-                <div class="muted small">IR Total Projetado</div>
+              <div class="stat-card" style="border-left-color:var(--danger)">
+                <div class="stat-label">IR Total Pago</div>
                 <div class="stat-value" id="projectedIRPaid">R$ 0,00</div>
               </div>
-              <div class="stat-card stat-card-total">
-                <div class="muted small">Renda Passiva Mensal (Final)</div>
+              <div class="stat-card stat-card-highlight">
+                <div class="stat-label">Renda Passiva Mensal</div>
                 <div class="stat-value" id="monthlyPassiveIncome">R$ 0,00</div>
               </div>
             </div>
 
-            <div class="chart-wrap">
-              <canvas id="growthChart" width="450" height="260"></canvas>
+            <div class="chart-container">
+              <canvas id="growthChart" width="450" height="280"></canvas>
             </div>
-            
-            <h4 style="color:var(--text); margin-top:20px; font-size:16px; border-bottom:1px solid var(--subtle-border); padding-bottom:5px;">Diversificação da Carteira</h4>
-            <div class="chart-wrap" style="background:none; box-shadow:none; padding:0; margin-top:10px;">
-              <canvas id="pieChart" width="450" height="220"></canvas>
-            </div>
-            <div id="categoryBreakdown" style="margin-top:12px;font-size:12px; padding:10px; background:var(--input-bg); border-radius:8px;"></div>
 
+            <h3 style="color:var(--text); font-size:18px; font-weight:700; margin:24px 0 16px">
+              Diversificação da Carteira
+            </h3>
+
+            <div class="chart-container" style="background:none; border:none; padding:0">
+              <canvas id="pieChart" width="450" height="240"></canvas>
+            </div>
+            <div id="categoryBreakdown" style="margin-top:16px; padding:16px; background:var(--input-bg); border-radius:10px; font-size:13px"></div>
           </div>
 
+          <!-- MONTHLY TAB -->
           <div id="monthly-tab" class="tab-content">
-            <div style="overflow-x:auto">
-              <table class="projection-table">
+            <div class="table-container" style="max-height:500px; overflow-y:auto">
+              <table>
                 <thead>
                   <tr>
                     <th>Mês</th>
-                    <th class="right">Patrimônio</th>
-                    <th class="right">Aporte</th>
-                    <th class="right">Proventos Brutos</th>
-                    <th class="right">IR</th>
-                    <th class="right">Proventos Líq.</th>
+                    <th class="text-right">Patrimônio</th>
+                    <th class="text-right">Aporte</th>
+                    <th class="text-right">Prov. Bruto</th>
+                    <th class="text-right">IR</th>
+                    <th class="text-right">Prov. Líq.</th>
                   </tr>
                 </thead>
                 <tbody id="monthlyProjectionBody"></tbody>
               </table>
             </div>
-            <div style="margin-top:15px;padding:12px;background:var(--highlight-bg);border-radius:8px;font-size:12px" id="monthlyStats"></div>
+
+            <div id="monthlyStats" style="margin-top:16px; padding:16px; background:var(--success-light); border-radius:10px; font-size:13px; color:var(--text-secondary)"></div>
           </div>
         </section>
-
       </aside>
     </div>
 
-    <div class="footer">
-      <strong>Simulador Financeiro Moderno</strong> — Por Gemini AI. Ferramenta educacional sem fins de aconselhamento.
-    </div>
+    <!-- FOOTER -->
+    <footer class="footer">
+      <strong>Simulador Financeiro Pro v2.0</strong> — Ferramenta educacional para planejamento financeiro
+    </footer>
   </div>
 
   <script>
-    // Todo o código JavaScript do sistema anterior permanece aqui, com pequenos ajustes
-    const $ = id => document.getElementById(id)
-    const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2})
+    // UTILITIES
+    const $ = id => document.getElementById(id);
+    const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
     const formatDate = dateString => {
-        if (!dateString) return 'N/A';
-        const [year, month, day] = dateString.split('-');
-        return `${day}/${month}/${year}`;
+      if (!dateString) return 'N/A';
+      const [year, month, day] = dateString.split('-');
+      return `${day}/${month}/${year}`;
     };
-    
-    let assets = []
-    let recurrentIncomes = [] 
-    let filterCategory = ''
-    let editingIndex = -1 
-    
-    const tbody = document.querySelector('#assetsTable tbody')
-    const recurrentTbody = document.querySelector('#recurrentIncomeTable tbody')
-    
-    // Elementos do Dashboard da Carteira
-    const totalInvestEl = $('totalInvest')
-    const totalYieldEl = $('totalYield')
-    const totalIREl = $('totalIR')
-    const netYieldEl = $('netYield')
-    const categoryNetStatsEl = $('categoryNetStats')
 
-    // Elementos dos Cards de Projeção
-    const projectedGrossYieldEl = $('projectedGrossYield')
-    const projectedIRPaidEl = $('projectedIRPaid')
-    const projectedNetYieldEl = $('projectedNetYield') // Usado para Patrimônio Final
-    const monthlyPassiveIncomeEl = $('monthlyPassiveIncome')
-    
-    // Elemento do Saldo Total de Rendas
-    const totalRecurrentIncomeEl = $('totalRecurrentIncome')
+    // STATE
+    let assets = [];
+    let recurrentIncomes = [];
+    let filterCategory = '';
+    let editingIndex = -1;
 
-    /*
-     * Lógica de Tributação (Mantida)
-     */
+    // DOM ELEMENTS
+    const tbody = document.querySelector('#assetsTable tbody');
+    const recurrentTbody = document.querySelector('#recurrentIncomeTable tbody');
+    const totalInvestEl = $('totalInvest');
+    const totalYieldEl = $('totalYield');
+    const totalIREl = $('totalIR');
+    const netYieldEl = $('netYield');
+    const categoryNetStatsEl = $('categoryNetStats');
+    const projectedGrossYieldEl = $('projectedGrossYield');
+    const projectedIRPaidEl = $('projectedIRPaid');
+    const projectedNetYieldEl = $('projectedNetYield');
+    const monthlyPassiveIncomeEl = $('monthlyPassiveIncome');
+    const totalRecurrentIncomeEl = $('totalRecurrentIncome');
+    const chartCanvas = $('growthChart');
+    const pieCanvas = $('pieChart');
+
+    // IR CALCULATION
     function calculateIR(income, category, irExempt, daysHeld) {
-      if (irExempt || category === 'FII' || category === 'Ações') return 0
+      if (irExempt || category === 'FII' || category === 'Ações') return 0;
       
-      let rate = 0.15 
+      let rate = 0.15;
 
       if (category === 'Renda Fixa' && daysHeld > 0) {
-        if (daysHeld <= 180) rate = 0.225
-        else if (daysHeld <= 360) rate = 0.20
-        else if (daysHeld <= 720) rate = 0.175
-        else rate = 0.15
+        if (daysHeld <= 180) rate = 0.225;
+        else if (daysHeld <= 360) rate = 0.20;
+        else if (daysHeld <= 720) rate = 0.175;
+        else rate = 0.15;
       }
 
-      return income * rate
+      return income * rate;
     }
 
     function getAssetNetProvento(a) {
-        const invested = a.qty * a.price
-        const provento = invested * (a.yield/100)
-        const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld)
-        return provento - ir
+      const invested = a.qty * a.price;
+      const provento = invested * (a.yield/100);
+      const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
+      return provento - ir;
     }
 
     function getTotalRecurrentBalance() {
-        return recurrentIncomes.reduce((sum, r) => sum + r.value, 0);
+      return recurrentIncomes.reduce((sum, r) => sum + r.value, 0);
     }
-    
-    // --- Lógica de Rendas Recorrentes (Mantida) ---
+
+    // RENDER RECURRENT TABLE
     function renderRecurrentTable() {
-        recurrentTbody.innerHTML = '';
-        const sortedRendas = [...recurrentIncomes].sort((a, b) => new Date(b.date) - new Date(a.date));
+      recurrentTbody.innerHTML = '';
+      const sortedRendas = [...recurrentIncomes].sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        sortedRendas.forEach((r, index) => {
-            const originalIndex = recurrentIncomes.indexOf(r); 
-
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${r.type}</strong></td>
-                <td class="right">${currency(r.value)}</td>
-                <td class="right">${formatDate(r.date)}</td>
-                <td>
-                    <button class="small-btn" onclick="deleteRecurrent(${originalIndex})">🗑️</button>
-                </td>
-            `;
-            recurrentTbody.appendChild(tr);
-        });
-        
-        totalRecurrentIncomeEl.textContent = currency(getTotalRecurrentBalance());
-        drawCharts(); 
+      sortedRendas.forEach((r) => {
+        const originalIndex = recurrentIncomes.indexOf(r);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${r.type}</strong></td>
+          <td class="text-right">${currency(r.value)}</td>
+          <td class="text-right">${formatDate(r.date)}</td>
+          <td>
+            <button class="btn btn-icon" onclick="deleteRecurrent(${originalIndex})">🗑️</button>
+          </td>
+        `;
+        recurrentTbody.appendChild(tr);
+      });
+      
+      totalRecurrentIncomeEl.textContent = currency(getTotalRecurrentBalance());
+      drawCharts();
     }
-    
+
+    // ADD RECURRENT INCOME
     $('addRecurrentBtn').addEventListener('click', () => {
-        const type = $('recurrentIncomeType').value;
-        const value = Number($('recurrentValue').value);
-        const date = $('recurrentDate').value;
+      const type = $('recurrentIncomeType').value;
+      const value = Number($('recurrentValue').value);
+      const date = $('recurrentDate').value;
 
-        if (value <= 0) return alert('O valor recebido deve ser maior que zero.');
-        if (!date) return alert('Selecione a data de recebimento.');
+      if (value <= 0) return alert('O valor deve ser maior que zero.');
+      if (!date) return alert('Selecione a data de recebimento.');
 
-        const newRecurrent = {
-            type,
-            value,
-            date,
-        };
-        
-        recurrentIncomes.push(newRecurrent);
-        renderRecurrentTable();
-        
-        $('recurrentValue').value = '50.00';
-        $('recurrentDate').value = new Date().toISOString().split('T')[0]; 
+      recurrentIncomes.push({ type, value, date });
+      renderRecurrentTable();
+      
+      $('recurrentValue').value = '50.00';
+      $('recurrentDate').value = new Date().toISOString().split('T')[0];
     });
 
     window.deleteRecurrent = function(index) {
-        if (confirm('Remover este pagamento de renda?')) {
-            recurrentIncomes.splice(index, 1);
-            renderRecurrentTable();
-        }
-    }
-    $('recurrentDate').value = new Date().toISOString().split('T')[0];
-    
-    // --- Lógica de Sugestões de Investimento (Mantida) ---
-    window.addExampleAsset = function(symbol, qty, price, category, yieldPerc, daysHeld = 721) {
-        const isExempt = (category === 'FII' || category === 'Ações' || symbol.includes('LCA') || symbol.includes('LCI') || symbol.includes('TSLC'));
-        // Para CDB/Tesouro, price é sempre 1.00, qty é o valor investido
-        const finalPrice = (category === 'Renda Fixa' && symbol.includes('CDB')) ? 1.00 : Number(price)
-        const finalQty = (category === 'Renda Fixa' && symbol.includes('CDB')) ? Number(qty) * price : Number(qty)
+      if (confirm('Remover este pagamento de renda?')) {
+        recurrentIncomes.splice(index, 1);
+        renderRecurrentTable();
+      }
+    };
 
-        const newAsset = {
-            symbol: symbol, 
-            qty: finalQty, 
-            price: finalPrice, 
-            yield: Number(yieldPerc), 
-            category: category,
-            irExempt: isExempt,
-            daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
-            purchaseDate: new Date().toISOString().split('T')[0]
-        };
-        
-        let existingIndex = -1;
-        if (category === 'Renda Fixa') {
-            existingIndex = assets.findIndex(a => a.symbol === symbol);
-        } else if (category === 'FII' || category === 'Ações') {
-            existingIndex = assets.findIndex(a => a.symbol === symbol && a.price === price);
-        }
-        
-        if (existingIndex !== -1 && category === 'Renda Fixa') {
-            assets[existingIndex].qty += newAsset.qty;
-            assets[existingIndex].yield = (assets[existingIndex].yield + newAsset.yield) / 2;
-        } else if (existingIndex !== -1 && (category === 'FII' || category === 'Ações')) {
-            assets[existingIndex].qty += newAsset.qty;
-        } else {
-            assets.push(newAsset);
-        }
+    // ADD EXAMPLE ASSET
+    window.addExample = function(symbol, qty, price, category, yieldPerc, daysHeld = 0, isExempt = false) {
+      const finalPrice = (category === 'Renda Fixa' && symbol.includes('CDB')) ? 1.00 : Number(price);
+      const finalQty = (category === 'Renda Fixa' && symbol.includes('CDB')) ? Number(qty) * price : Number(qty);
 
-        renderTable();
-        alert(`✅ Ativo ${symbol} adicionado à sua carteira!`);
-    }
+      const newAsset = {
+        symbol,
+        qty: finalQty,
+        price: finalPrice,
+        yield: Number(yieldPerc),
+        category,
+        irExempt: isExempt || category === 'FII' || category === 'Ações',
+        daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
+        purchaseDate: new Date().toISOString().split('T')[0]
+      };
 
-    
+      assets.push(newAsset);
+      renderTable();
+      alert(`✅ ${symbol} adicionado à carteira!`);
+    };
+
+    // RENDER CATEGORY STATS
     function renderCategoryNetStats() {
-        const categories = {}
-        let totalNetAnnual = 0;
-        
-        // 1. Coletar dados dos ativos
-        assets.forEach(a => {
-            const category = a.category;
-            const invested = a.qty * a.price;
-            const netProvento = getAssetNetProvento(a);
-            
-            if (!categories[category]) {
-                categories[category] = { invested: 0, netYield: 0, isExternal: false };
-            }
-            categories[category].invested += invested;
-            categories[category].netYield += netProvento;
-            totalNetAnnual += netProvento;
-        });
-
-        // 2. Coletar dados das Rendas Recorrentes
-        const oneYearAgo = new Date();
-        oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-        const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
-        
-        const externalYields = relevantRendas.reduce((acc, r) => {
-            acc[r.type] = (acc[r.type] || 0) + r.value;
-            return acc;
-        }, {});
-        
-        Object.entries(externalYields).forEach(([type, value]) => {
-            const key = `Renda_${type}`;
-            categories[key] = {
-                invested: 0, 
-                netYield: value, 
-                isExternal: true, 
-                type: type,
-                label: `Acumulado Últimos 12m`
-            };
-        });
-
-        // 3. Renderizar Cards
-        let html = '';
-        let totalExternalYield = 0;
-        
-        Object.entries(categories).forEach(([key, data]) => {
-            const isExternal = data.isExternal;
-            let title, description, classType = '';
-
-            if (isExternal) {
-                totalExternalYield += data.netYield;
-                classType = 'external-yield';
-                title = data.type;
-                description = data.label;
-                html += `
-                    <div class="category-stat-card ${classType}">
-                        <div class="muted small">GANHO ACUMULADO (${title})</div>
-                        <div class="stat-value">${currency(data.netYield)}</div>
-                        <div class="muted small">${description}</div>
-                    </div>
-                `;
-            } else {
-                title = key;
-                description = `Patrimônio: ${currency(data.invested)}`;
-                html += `
-                    <div class="category-stat-card">
-                        <div class="muted small">PROVENTO LÍQUIDO ANUAL (${title})</div>
-                        <div class="stat-value">${currency(data.netYield)}</div>
-                        <div class="muted small">${description}</div>
-                    </div>
-                `;
-            }
-        });
-        
-        // Renderizar Card Total de Ativos
-        const totalInvestedFromAssets = assets.reduce((s,a)=>s + a.qty*a.price, 0);
-        html += `
-            <div class="category-stat-card total-yield">
-                <div class="muted small">TOTAL LÍQUIDO ANUAL (ATIVOS)</div>
-                <div class="stat-value">${currency(totalNetAnnual)}</div>
-                <div class="muted small">Investido Total: ${currency(totalInvestedFromAssets)}</div>
-            </div>
-        `;
-
-        categoryNetStatsEl.innerHTML = html;
-    }
-    
-    function renderTable() {
-      tbody.innerHTML = ''
-      
-      const allInvest = assets.reduce((s,a)=>s+a.qty*a.price,0)
-      let allYield = 0, allIR = 0
+      const categories = {};
+      let totalNetAnnual = 0;
       
       assets.forEach(a => {
-        const invested = a.qty * a.price
-        const provento = invested * (a.yield/100)
-        const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld)
+        const category = a.category;
+        const invested = a.qty * a.price;
+        const netProvento = getAssetNetProvento(a);
         
-        allYield += provento
-        allIR += ir
-      })
+        if (!categories[category]) {
+          categories[category] = { invested: 0, netYield: 0, isExternal: false };
+        }
+        categories[category].invested += invested;
+        categories[category].netYield += netProvento;
+        totalNetAnnual += netProvento;
+      });
 
-      const filteredAssets = filterCategory ? assets.filter(a => a.category === filterCategory) : assets
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
+      
+      const externalYields = relevantRendas.reduce((acc, r) => {
+        acc[r.type] = (acc[r.type] || 0) + r.value;
+        return acc;
+      }, {});
+      
+      Object.entries(externalYields).forEach(([type, value]) => {
+        const key = `Renda_${type}`;
+        categories[key] = {
+          invested: 0,
+          netYield: value,
+          isExternal: true,
+          type: type,
+          label: 'Acumulado 12 meses'
+        };
+      });
+
+      let html = '';
+      
+      Object.entries(categories).forEach(([key, data]) => {
+        if (data.isExternal) {
+          html += `
+            <div class="category-card category-card-external">
+              <div class="stat-label">💵 ${data.type}</div>
+              <div class="stat-value">${currency(data.netYield)}</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px">${data.label}</div>
+            </div>
+          `;
+        } else {
+          html += `
+            <div class="category-card">
+              <div class="stat-label">${key}</div>
+              <div class="stat-value">${currency(data.netYield)}</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Investido: ${currency(data.invested)}</div>
+            </div>
+          `;
+        }
+      });
+
+      const totalInvestedFromAssets = assets.reduce((s,a)=>s + a.qty*a.price, 0);
+      html += `
+        <div class="category-card category-card-total">
+          <div class="stat-label">💎 TOTAL (ATIVOS)</div>
+          <div class="stat-value">${currency(totalNetAnnual)}</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Patrimônio: ${currency(totalInvestedFromAssets)}</div>
+        </div>
+      `;
+
+      categoryNetStatsEl.innerHTML = html;
+    }
+
+    // RENDER TABLE
+    function renderTable() {
+      tbody.innerHTML = '';
+      
+      const allInvest = assets.reduce((s,a)=>s+a.qty*a.price,0);
+      let allYield = 0, allIR = 0;
+      
+      assets.forEach(a => {
+        const invested = a.qty * a.price;
+        const provento = invested * (a.yield/100);
+        const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
+        
+        allYield += provento;
+        allIR += ir;
+      });
+
+      const filteredAssets = filterCategory ? assets.filter(a => a.category === filterCategory) : assets;
       
       filteredAssets.forEach((a) => {
-        const invested = a.qty * a.price
-        const provento = invested * (a.yield/100)
-        const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld)
+        const invested = a.qty * a.price;
+        const provento = invested * (a.yield/100);
+        const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
         const netProvento = provento - ir;
-        const percentage = allInvest ? (invested / allInvest * 100) : 0
+        const percentage = allInvest ? (invested / allInvest * 100) : 0;
         
         const isExemptByRule = a.category === 'FII' || a.category === 'Ações' || a.irExempt;
-        const irClass = isExemptByRule ? 'ir-exempt' : 'ir-warning'
-        const irText = isExemptByRule ? 'Isento' : currency(ir)
+        const badgeClass = isExemptByRule ? 'badge-success' : 'badge-danger';
+        const irText = isExemptByRule ? 'Isento' : currency(ir);
         
-        const tr = document.createElement('tr')
+        const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><strong>${a.symbol}</strong></td>
           <td><span class="badge">${a.category}</span></td>
-          <td class="right">${a.qty}</td>
-          <td class="right">${currency(invested)}</td>
-          <td class="right">${percentage.toFixed(1)}%</td>
-          <td class="right">${a.yield.toFixed(2)}%</td>
-          <td class="right">${currency(netProvento)}</td>
-          <td class="right ${irClass}">${irText}</td>
+          <td class="text-right">${a.qty}</td>
+          <td class="text-right">${currency(invested)}</td>
+          <td class="text-right">${percentage.toFixed(1)}%</td>
+          <td class="text-right">${a.yield.toFixed(2)}%</td>
+          <td class="text-right">${currency(netProvento)}</td>
+          <td class="text-right"><span class="badge ${badgeClass}">${irText}</span></td>
           <td>
-            <button class="small-btn" onclick="editAsset(${assets.indexOf(a)})">✏️</button>
-            <button class="small-btn" onclick="deleteAsset(${assets.indexOf(a)})">🗑️</button>
+            <button class="btn btn-icon" onclick="editAsset(${assets.indexOf(a)})">✏️</button>
+            <button class="btn btn-icon" onclick="deleteAsset(${assets.indexOf(a)})">🗑️</button>
           </td>
-        `
-        tbody.appendChild(tr)
-      })
+        `;
+        tbody.appendChild(tr);
+      });
       
-      const netYield = allYield - allIR
+      const netYield = allYield - allIR;
       
-      totalInvestEl.textContent = currency(allInvest)
-      totalYieldEl.textContent = currency(allYield)
-      totalIREl.textContent = currency(allIR)
-      netYieldEl.textContent = currency(netYield) // Apenas ativos
+      totalInvestEl.textContent = currency(allInvest);
+      totalYieldEl.textContent = currency(allYield);
+      totalIREl.textContent = currency(allIR);
+      netYieldEl.textContent = currency(netYield);
       
-      drawCharts()
+      drawCharts();
       renderCategoryNetStats();
     }
-    
-    // ... Funções processAsset, resetForm, editAsset, deleteAsset, loadSaved, saveBtn, clearBtn, import/export (Mantidas) ...
 
+    // PROCESS ASSET
     function processAsset() {
-      const symbol = $('symbol').value.trim().toUpperCase()
-      const qty = $('qty').value
-      const price = $('price').value
-      const yieldPerc = $('yield').value
-      const category = $('category').value
-      const irExempt = $('irExempt').checked
-      const daysHeld = $('daysHeld').value
-      const purchaseDate = $('purchaseDate').value
+      const symbol = $('symbol').value.trim().toUpperCase();
+      const qty = $('qty').value;
+      const price = $('price').value;
+      const yieldPerc = $('yield').value;
+      const category = $('category').value;
+      const irExempt = $('irExempt').checked;
+      const daysHeld = $('daysHeld').value;
+      const purchaseDate = $('purchaseDate').value;
 
-      if(!symbol) return alert('Preencha o símbolo')
-      if(Number(qty) <= 0 || Number(price) <= 0) return alert('Quantidade e Preço devem ser maiores que zero.')
+      if(!symbol) return alert('Preencha o símbolo');
+      if(Number(qty) <= 0 || Number(price) <= 0) return alert('Quantidade e Preço devem ser maiores que zero.');
 
       const newAsset = {
-        symbol, 
-        qty:Number(qty), 
-        price:Number(price), 
-        yield:Number(yieldPerc), 
+        symbol,
+        qty:Number(qty),
+        price:Number(price),
+        yield:Number(yieldPerc),
         category: category || 'Outros',
         irExempt: Boolean(irExempt),
         daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
-        purchaseDate: purchaseDate 
-      }
+        purchaseDate: purchaseDate
+      };
       
       if(editingIndex !== -1) {
-        assets[editingIndex] = newAsset 
+        assets[editingIndex] = newAsset;
       } else {
-        assets.push(newAsset)
+        assets.push(newAsset);
       }
 
-      renderTable()
-      resetForm()
+      renderTable();
+      resetForm();
     }
-    
+
+    // RESET FORM
     function resetForm() {
-      $('symbol').value=''; $('qty').value=1; $('price').value=10.00; $('yield').value=10.00; 
-      $('category').value='FII'; $('irExempt').checked=false; $('daysHeld').value=721;
+      $('symbol').value='';
+      $('qty').value=1;
+      $('price').value=10.00;
+      $('yield').value=10.00;
+      $('category').value='FII';
+      $('irExempt').checked=false;
+      $('daysHeld').value=721;
       $('purchaseDate').value = new Date().toISOString().split('T')[0];
       
-      editingIndex = -1
-      $('addBtn').style.display = 'block'
-      $('updateBtn').style.display = 'none'
-      $('assetFormTitle').innerHTML = '<span class="icon">➕</span> Adicionar Ativo / Fundo'
+      editingIndex = -1;
+      $('addBtn').style.display = 'inline-flex';
+      $('updateBtn').style.display = 'none';
+      $('formTitle').textContent = 'Adicionar Ativo';
       
-      $('category').dispatchEvent(new Event('change'))
+      $('category').dispatchEvent(new Event('change'));
     }
-    
-    function editAsset(index) {
-      const a = assets[index]
+
+    // EDIT ASSET
+    window.editAsset = function(index) {
+      const a = assets[index];
       
-      $('symbol').value = a.symbol
-      $('qty').value = a.qty
-      $('price').value = a.price
-      $('yield').value = a.yield
-      $('category').value = a.category
-      $('irExempt').checked = a.irExempt
-      $('daysHeld').value = a.daysHeld || 721
+      $('symbol').value = a.symbol;
+      $('qty').value = a.qty;
+      $('price').value = a.price;
+      $('yield').value = a.yield;
+      $('category').value = a.category;
+      $('irExempt').checked = a.irExempt;
+      $('daysHeld').value = a.daysHeld || 721;
       $('purchaseDate').value = a.purchaseDate || new Date().toISOString().split('T')[0];
       
-      $('category').dispatchEvent(new Event('change'))
+      $('category').dispatchEvent(new Event('change'));
 
-      $('addBtn').style.display = 'none'
-      $('updateBtn').style.display = 'block'
-      $('assetFormTitle').innerHTML = `✏️ Editando: ${a.symbol}`
-      editingIndex = index
-    }
-    
-    function deleteAsset(index) {
+      $('addBtn').style.display = 'none';
+      $('updateBtn').style.display = 'inline-flex';
+      $('formTitle').textContent = `Editando: ${a.symbol}`;
+      editingIndex = index;
+    };
+
+    // DELETE ASSET
+    window.deleteAsset = function(index) {
       if(confirm(`Remover ${assets[index].symbol}?`)){
-        assets.splice(index, 1)
-        renderTable()
-        resetForm()
+        assets.splice(index, 1);
+        renderTable();
+        resetForm();
       }
-    }
+    };
 
-    $('addBtn').addEventListener('click', processAsset)
-    $('updateBtn').addEventListener('click', processAsset)
+    // EVENT LISTENERS
+    $('addBtn').addEventListener('click', processAsset);
+    $('updateBtn').addEventListener('click', processAsset);
     
     $('presetBtn').addEventListener('click', ()=>{
-      resetForm() 
-      assets.push({symbol: 'RZAG11', qty: 2, price: 9.00, yield: 16.4, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-01'})
-      assets.push({symbol: 'MXRF11', qty: 1, price: 9.61, yield: 12.7, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-15'})
-      assets.push({symbol: 'TSLC', qty: 500, price: 1.00, yield: 12.00, category: 'Renda Fixa', irExempt: false, daysHeld: 100, purchaseDate: '2025-09-01'}) // Tesouro Selic
+      resetForm();
+      assets.push({symbol: 'RZAG11', qty: 2, price: 9.00, yield: 16.4, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-01'});
+      assets.push({symbol: 'MXRF11', qty: 1, price: 9.61, yield: 12.7, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-15'});
+      assets.push({symbol: 'TSLC', qty: 500, price: 1.00, yield: 12.00, category: 'Renda Fixa', irExempt: false, daysHeld: 100, purchaseDate: '2025-09-01'});
       
-      recurrentIncomes.push({ type: 'Kwai/TikTok', value: 150.00, date: '2025-10-25' })
-      recurrentIncomes.push({ type: '99Pay', value: 300.00, date: '2025-11-05' })
-      recurrentIncomes.push({ type: 'Freelancer', value: 500.00, date: '2025-11-10' })
+      recurrentIncomes.push({ type: 'Kwai/TikTok', value: 150.00, date: '2025-10-25' });
+      recurrentIncomes.push({ type: '99Pay', value: 300.00, date: '2025-11-05' });
+      recurrentIncomes.push({ type: 'Freelancer', value: 500.00, date: '2025-11-10' });
 
-
-      renderTable()
+      renderTable();
       renderRecurrentTable();
-      resetForm()
-    })
-    
-    // ... Lógica de Load/Save/Import/Export/Filter (Mantida) ...
+      resetForm();
+      alert('✅ Exemplos adicionados com sucesso!');
+    });
 
+    $('clearBtn').addEventListener('click', ()=>{
+      if(confirm('Limpar todos os ativos da carteira?')){
+        assets = [];
+        renderTable();
+        resetForm();
+      }
+    });
+
+    // STORAGE FUNCTIONS
     function loadSaved(){
-      const rawAssets = localStorage.getItem('simulator_assets')
-      if(rawAssets){ 
-        assets = JSON.parse(rawAssets)
-      }
-      const rawRecurrent = localStorage.getItem('simulator_recurrent')
-      if(rawRecurrent){ 
-        recurrentIncomes = JSON.parse(rawRecurrent)
-      }
-      renderTable()
-      renderRecurrentTable()
+      const rawAssets = localStorage.getItem('simulator_assets');
+      if(rawAssets) assets = JSON.parse(rawAssets);
+      
+      const rawRecurrent = localStorage.getItem('simulator_recurrent');
+      if(rawRecurrent) recurrentIncomes = JSON.parse(rawRecurrent);
+      
+      renderTable();
+      renderRecurrentTable();
     }
-    loadSaved()
-    
+
+    $('saveBtn').addEventListener('click', ()=>{
+      localStorage.setItem('simulator_assets', JSON.stringify(assets));
+      localStorage.setItem('simulator_recurrent', JSON.stringify(recurrentIncomes));
+      alert('✅ Dados salvos com sucesso!');
+    });
+
+    $('resetStorage').addEventListener('click', ()=>{
+      if(confirm('⚠️ Apagar TODOS os dados salvos? Esta ação não pode ser desfeita!')){
+        localStorage.removeItem('simulator_assets');
+        localStorage.removeItem('simulator_recurrent');
+        assets = [];
+        recurrentIncomes = [];
+        renderTable();
+        renderRecurrentTable();
+        alert('✅ Dados apagados!');
+      }
+    });
+
+    // EXPORT
     $('exportBtn').addEventListener('click', ()=>{
-      if(assets.length===0 && recurrentIncomes.length===0) return alert('Nenhum dado para exportar')
+      if(assets.length===0 && recurrentIncomes.length===0) return alert('Nenhum dado para exportar');
 
-      let csv = 'Simulador Financeiro - Export\n\n'
+      let csv = 'Simulador Financeiro - Export\n\n';
       
-      csv += 'Carteira de Ativos\n'
-      const assetRows = [['symbol','category','qty','price','yield','irExempt','daysHeld','purchaseDate']]
-      assets.forEach(a=>assetRows.push([a.symbol,a.category,a.qty,a.price,a.yield,a.irExempt,a.daysHeld || 0, a.purchaseDate || 'N/A']))
-      csv += assetRows.map(r=>r.join(',')).join('\n') + '\n\n'
+      csv += 'Carteira de Ativos\n';
+      const assetRows = [['symbol','category','qty','price','yield','irExempt','daysHeld','purchaseDate']];
+      assets.forEach(a=>assetRows.push([a.symbol,a.category,a.qty,a.price,a.yield,a.irExempt,a.daysHeld || 0, a.purchaseDate || 'N/A']));
+      csv += assetRows.map(r=>r.join(',')).join('\n') + '\n\n';
 
-      csv += 'Rendas Recorrentes\n'
-      const recurrentRows = [['type','value','date']]
-      recurrentIncomes.forEach(r=>recurrentRows.push([r.type, r.value, r.date]))
-      csv += recurrentRows.map(r=>r.join(',')).join('\n')
+      csv += 'Rendas Recorrentes\n';
+      const recurrentRows = [['type','value','date']];
+      recurrentIncomes.forEach(r=>recurrentRows.push([r.type, r.value, r.date]));
+      csv += recurrentRows.map(r=>r.join(',')).join('\n');
 
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'})
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = 'carteira_completa_' + new Date().toISOString().split('T')[0] + '.csv'
-      link.click()
-      URL.revokeObjectURL(url)
-    })
-    
-    $('importBtn').addEventListener('click', ()=> $('importFile').click())
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'carteira_' + new Date().toISOString().split('T')[0] + '.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // IMPORT
+    $('importBtn').addEventListener('click', ()=> $('importFile').click());
     $('importFile').addEventListener('change', (e)=>{
-        const file = e.target.files[0]
-        if(!file) return
-        const reader = new FileReader()
-        reader.onload = (ev)=>{
-            const text = ev.target.result
-            const lines = text.split('\n')
-            
-            let inAssets = false
-            let inRecurrent = false
-            assets = []
-            recurrentIncomes = []
+      const file = e.target.files[0];
+      if(!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        const text = ev.target.result;
+        const lines = text.split('\n');
+        
+        let inAssets = false;
+        let inRecurrent = false;
+        assets = [];
+        recurrentIncomes = [];
 
-            lines.forEach(line=>{
-                line = line.trim()
-                if (!line) return;
+        lines.forEach(line=>{
+          line = line.trim();
+          if (!line) return;
 
-                if (line === 'Carteira de Ativos') {
-                    inAssets = true
-                    inRecurrent = false
-                    return
-                } else if (line === 'Rendas Recorrentes') {
-                    inAssets = false
-                    inRecurrent = true
-                    return
-                } else if (line.startsWith('symbol') || line.startsWith('type')) {
-                    return
-                }
+          if (line === 'Carteira de Ativos') {
+            inAssets = true;
+            inRecurrent = false;
+            return;
+          } else if (line === 'Rendas Recorrentes') {
+            inAssets = false;
+            inRecurrent = true;
+            return;
+          } else if (line.startsWith('symbol') || line.startsWith('type')) {
+            return;
+          }
 
-                const values = line.split(',')
+          const values = line.split(',');
 
-                if (inAssets && values.length >= 8) {
-                    const [symbol,category,qty,price,yieldVal,irExempt,daysHeld,purchaseDate] = values
-                    if(symbol && symbol.trim()) {
-                        assets.push({
-                          symbol: symbol.trim(), 
-                          qty: Number(qty), 
-                          price: Number(price), 
-                          yield: Number(yieldVal), 
-                          category: category,
-                          irExempt: irExempt === 'true',
-                          daysHeld: Number(daysHeld) || 0,
-                          purchaseDate: purchaseDate || 'N/A'
-                        });
-                    }
-                } else if (inRecurrent && values.length >= 3) {
-                    const [type, value, date] = values
-                    recurrentIncomes.push({
-                        type: type,
-                        value: Number(value),
-                        date: date || new Date().toISOString().split('T')[0]
-                    });
-                }
-            })
-
-            renderTable()
-            renderRecurrentTable()
-            alert('✅ Carteira e Rendas importadas com sucesso!')
-        }
-        reader.readAsText(file)
-        e.target.value = ''
-    })
+          if (inAssets && values.length >= 8) {
+            const [symbol,category,qty,price,yieldVal,irExempt,daysHeld,purchaseDate] = values;
+            if(symbol && symbol.trim()) {
+              assets.push({
+                symbol: symbol.trim(),
+                qty: Number(qty),
+                price: Number(price),
+                yield: Number(yieldVal),
+                category: category,
+                irExempt: irExempt === 'true',
+                daysHeld: Number(daysHeld) || 0,
+                purchaseDate: purchaseDate || 'N/A'
+              });
+            }
+          <!doctype html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simulador Financeiro Pro — Rendas e Investimentos</title>
+  <style>
+    /* VARIÁVEIS DE TEMA - DARK MODE */
+    :root {
+      --bg: #0a0e1a;
+      --bg-secondary: #111827;
+      --card: #1a1f2e;
+      --card-hover: #20253a;
+      --accent: #06b6d4;
+      --accent-hover: #0891b2;
+      --accent-light: rgba(6, 182, 212, 0.1);
+      --success: #10b981;
+      --success-light: rgba(16, 185, 129, 0.1);
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-light: rgba(255, 255, 255, 0.05);
+      --input-bg: #0f1419;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.4);
+      --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+      --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --gradient-bg: linear-gradient(180deg, #0a0e1a 0%, #111827 100%);
+    }
     
-    $('filterCategory').addEventListener('change', (e)=>{
-      filterCategory = e.target.value
-      renderTable()
-    })
-    
-    const chartCanvas = $('growthChart')
-    const pieCanvas = $('pieChart')
-    
-    function drawCharts(){
-      drawGrowthChart()
-      drawPieChart()
-      drawMonthlyProjection()
-      renderCategoryNetStats();
+    /* VARIÁVEIS DE TEMA - LIGHT MODE */
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --card: #ffffff;
+      --card-hover: #f8fafc;
+      --accent: #0284c7;
+      --accent-hover: #0369a1;
+      --accent-light: rgba(2, 132, 199, 0.1);
+      --success: #059669;
+      --success-light: rgba(5, 150, 105, 0.1);
+      --warning: #d97706;
+      --danger: #dc2626;
+      --text: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --border: rgba(0, 0, 0, 0.1);
+      --border-light: rgba(0, 0, 0, 0.05);
+      --input-bg: #f8fafc;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+      --gradient-primary: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%);
+      --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
+      --gradient-bg: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
     }
 
-    // Ajuste na função de Crescimento para atualizar os novos cards de projeção
-    function drawGrowthChart(){
-      const ctx = chartCanvas.getContext('2d')
-      ctx.clearRect(0,0,chartCanvas.width, chartCanvas.height)
-      
-      const years = Number($('years').value)
-      const reinvest = $('reinvest').checked
-      const monthlyAdd = Number($('monthlyContribution').value)
-      const considerInflation = $('considerInflation').checked
-      const inflationRate = 0.045
-      
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-      const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
-      const totalLastYear = relevantRendas.reduce((sum, r) => sum + r.value, 0);
-      const monthlyExternalNet = totalLastYear / 12;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-      const totalInvest = assets.reduce((s,a)=>s + a.qty*a.price, 0)
-      
-      const weightedYield = assets.length && totalInvest > 0 ? 
-        assets.reduce((s,a)=> s + getAssetNetProvento(a), 0) / totalInvest : 0
-      
-      let points = []
-      let value = totalInvest
-      let totalGrossYield = 0;
-      let totalIRPaid = 0;
-      
-      for(let y=0; y<=years; y++){
-        let currentInflation = considerInflation ? Math.pow(1 + inflationRate, y) : 1
-        points.push({ nominal: Number(value.toFixed(2)), real: Number((value / currentInflation).toFixed(2)) })
-        
-        const yearlyContributions = monthlyAdd * 12
-        const yearlyExternalYieldNet = monthlyExternalNet * 12 
-        
-        // Simulação do IR e Proventos (simplificada para o gráfico)
-        let yearlyNetDividend = value * weightedYield;
-        let yearlyGrossDividend = yearlyNetDividend / (1 - (calculateIR(1, 'Outros', false, 721)/1)); // Estima o bruto
-        let yearlyIR = yearlyGrossDividend - yearlyNetDividend;
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--gradient-bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+      min-height: 100vh;
+    }
 
-        if (y > 0) {
-            totalGrossYield += yearlyGrossDividend + (monthlyExternalNet * 12);
-            totalIRPaid += yearlyIR; 
-        }
+    .app-container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 16px;
+    }
 
-        if(reinvest){ 
-          value = value + yearlyNetDividend + yearlyContributions + yearlyExternalYieldNet
-        } else { 
-          value = value + yearlyContributions 
-        }
+    /* HEADER */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px;
+      margin-bottom: 24px;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-content h1 {
+      font-size: 28px;
+      font-weight: 800;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .theme-toggle {
+      padding: 10px 20px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      font-size: 14px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle:hover {
+      background: var(--card-hover);
+      transform: translateY(-1px);
+    }
+
+    /* GRID LAYOUT */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 24px;
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border-light);
+    }
+
+    .card-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      flex: 1;
+    }
+
+    .card-icon {
+      font-size: 24px;
+    }
+
+    /* FORM CONTROLS */
+    .form-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--card);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+      font-family: inherit;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--gradient-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-success {
+      background: var(--gradient-success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-warning {
+      background: var(--warning);
+      color: white;
+    }
+
+    .btn-secondary {
+      background: #8b5cf6;
+      color: white;
+    }
+
+    .btn-icon {
+      padding: 8px 12px;
+      font-size: 16px;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-icon:hover {
+      background: var(--card-hover);
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* STATS CARDS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .stat-card {
+      background: var(--input-bg);
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent);
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .stat-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .stat-card-highlight {
+      background: var(--gradient-success);
+      color: white;
+      border-left-color: white;
+    }
+
+    .stat-card-highlight .stat-label,
+    .stat-card-highlight .stat-value {
+      color: white;
+    }
+
+    /* TABLE */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead {
+      background: var(--input-bg);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    th {
+      padding: 14px 12px;
+      text-align: left;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--border-light);
+      color: var(--text-secondary);
+    }
+
+    tbody tr {
+      transition: background 0.2s;
+    }
+
+    tbody tr:hover {
+      background: var(--card-hover);
+    }
+
+    .text-right {
+      text-align: right;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .badge-success {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .tab {
+      padding: 12px 20px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      font-weight: 700;
+      color: var(--text-muted);
+      transition: all 0.2s;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tab:hover {
+      color: var(--text);
+      background: var(--card-hover);
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SUGGESTIONS */
+    .suggestion-card {
+      background: var(--input-bg);
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border-light);
+      transition: all 0.2s;
+    }
+
+    .suggestion-card:hover {
+      border-color: var(--accent);
+      background: var(--card-hover);
+    }
+
+    .suggestion-content {
+      flex: 1;
+    }
+
+    .suggestion-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .suggestion-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* BALANCE CARD */
+    .balance-card {
+      background: var(--gradient-success);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4);
+      margin-top: 20px;
+    }
+
+    .balance-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+    }
+
+    .balance-value {
+      font-size: 36px;
+      font-weight: 900;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* CHART CONTAINER */
+    .chart-container {
+      background: var(--input-bg);
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      border: 1px solid var(--border-light);
+    }
+
+    /* CATEGORY STATS */
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      background: var(--input-bg);
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      margin-top: 16px;
+    }
+
+    .category-card {
+      padding: 16px;
+      border-radius: 10px;
+      background: var(--card);
+      border-left: 4px solid var(--accent);
+      transition: all 0.2s;
+    }
+
+    .category-card:hover {
+      transform: scale(1.02);
+      box-shadow: var(--shadow);
+    }
+
+    .category-card-external {
+      border-left-color: #8b5cf6;
+    }
+
+    .category-card-total {
+      background: var(--accent-light);
+      border-left-color: var(--success);
+    }
+
+    /* CHECKBOX GROUP */
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: var(--input-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .checkbox-group:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+    }
+
+    .checkbox-group label {
+      cursor: pointer;
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: none;
+      letter-spacing: normal;
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 24px;
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1200px) {
+      .main-grid {
+        grid-template-columns: 1fr 420px;
       }
-      
-      // Desenho do Gráfico (Omitido o código, mantendo apenas a lógica de dados)
-      // ...
-
-      const finalValue = points[points.length-1].nominal
-      const finalRealValue = points[points.length-1].real
-      const totalContributions = totalInvest + (monthlyAdd * 12 * years)
-      const totalGains = finalValue - totalContributions
-      
-      // Atualiza os novos Cards de Projeção
-      projectedNetYieldEl.textContent = currency(finalValue) // Patrimônio Final
-      projectedGrossYieldEl.textContent = currency(totalGains) // Ganhos Nominais
-      projectedIRPaidEl.textContent = currency(totalIRPaid) // IR Total Projetado
-
-      const finalMonthlyPassive = finalValue * weightedYield / 12 + monthlyExternalNet;
-      monthlyPassiveIncomeEl.textContent = currency(finalMonthlyPassive);
-
-      // Atualiza o resumo no Monthly Tab
-      $('monthlyStats').innerHTML = `
-        <strong>📊 Resumo acumulado (${years} anos):</strong><br>
-        Patrimônio Final (Nominal): ${currency(finalValue)} | Ganhos Nominais: ${currency(totalGains)}<br>
-        Renda Passiva Mensal Estimada no Final: ${currency(finalMonthlyPassive)}
-        ${considerInflation ? `| Patrimônio Final (Real): ${currency(finalRealValue)}` : ''}
-      `
     }
-    
-    function drawMonthlyProjection() {
-      // ... Lógica de drawMonthlyProjection (Mantida) ...
-      const tbody = $('monthlyProjectionBody')
-      tbody.innerHTML = ''
-      
-      const years = Number($('years').value)
-      const reinvest = $('reinvest').checked
-      const monthlyAdd = Number($('monthlyContribution').value)
-      
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-      const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
-      const totalLastYear = relevantRendas.reduce((sum, r) => sum + r.value, 0);
-      const monthlyExternalNet = totalLastYear / 12;
-      
-      const totalExternalGrossMonthly = monthlyExternalNet; 
-      const totalExternalIRMonthly = 0;
 
-      const totalInvest = assets.reduce((s,a)=>s + a.qty*a.price, 0)
-      
-      let patrimony = totalInvest
-      let totalProventosNet = 0 
-      let totalGrossProventos = 0 
-      let totalIRPaid = 0
-      let totalAportes = totalInvest 
-      
-      const totalMonths = years * 12
-      const showEvery = totalMonths > 60 ? 3 : 1
-      
-      for(let month = 1; month <= totalMonths; month++) {
-        
-        let grossProventoInvest = 0;
-        let monthlyIRInvest = 0;
-
-        if(totalInvest > 0) {
-            assets.forEach(a => {
-                const assetProportion = (a.qty * a.price) / totalInvest;
-                const assetInvestedInMonth = patrimony * assetProportion;
-                
-                const assetProvento = (assetInvestedInMonth * (a.yield/100) / 12)
-                const assetIR = calculateIR(assetProvento, a.category, a.irExempt, a.daysHeld);
-                
-                grossProventoInvest += assetProvento;
-                monthlyIRInvest += assetIR;
-            });
-        }
-        
-        const grossProventoTotal = grossProventoInvest + totalExternalGrossMonthly
-        const monthlyIRTotal = monthlyIRInvest + totalExternalIRMonthly
-        const monthlyProventoNet = grossProventoTotal - monthlyIRTotal 
-
-        patrimony += monthlyAdd
-        if(month > 0) { 
-          totalAportes += monthlyAdd
-        }
-        
-        if(reinvest) {
-          patrimony += monthlyProventoNet
-        }
-        
-        totalProventosNet += monthlyProventoNet
-        totalGrossProventos += grossProventoTotal
-        totalIRPaid += monthlyIRTotal
-        
-        if(month % showEvery === 0 || month === totalMonths) {
-          const tr = document.createElement('tr')
-          const isHighlight = month % 12 === 0 ? ' class="highlight"' : ''
-          tr.innerHTML = `
-            <td${isHighlight}>${month}</td>
-            <td class="right"${isHighlight}>${currency(patrimony)}</td>
-            <td class="right"${isHighlight}>${currency(monthlyAdd)}</td>
-            <td class="right"${isHighlight}>${currency(grossProventoTotal)}</td>
-            <td class="right ${monthlyIRTotal > 0 ? 'ir-warning' : 'ir-exempt'}"${isHighlight}>${currency(monthlyIRTotal)}</td>
-            <td class="right ${monthlyProventoNet > 0 ? 'ir-exempt' : ''}"${isHighlight}>${currency(monthlyProventoNet)}</td>
-          `
-          tbody.appendChild(tr)
-        }
+    @media (max-width: 968px) {
+      .main-grid {
+        grid-template-columns: 1fr;
       }
 
-      // Os cards de projeção são atualizados no drawGrowthChart para evitar duplicação de lógica.
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
-    function drawPieChart(){
-        // ... Lógica de drawPieChart (Mantida) ...
-        const ctx = pieCanvas.getContext('2d')
-        ctx.clearRect(0,0,pieCanvas.width, pieCanvas.height)
-        
-        if(assets.length === 0) {
-            ctx.fillStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? '#94a3b8' : '#64748b'
-            ctx.font = '14px sans-serif'
-            ctx.textAlign = 'center'
-            ctx.fillText('Adicione ativos para visualizar', pieCanvas.width/2, pieCanvas.height/2)
-            $('categoryBreakdown').innerHTML = '<div class="muted small">Nenhum ativo adicionado</div>'
-            return
-        }
-        
-        const categories = {}
-        const totalInvest = assets.reduce((s,a)=>s+a.qty*a.price,0)
-        assets.forEach(a=>{
-            const inv = a.qty * a.price
-            categories[a.category] = (categories[a.category]||0) + inv
-        })
-        
-        const colors = ['#06b6d4','#8b5cf6','#f59e0b','#10b981','#ef4444','#ec4899','#6366f1','#14b8a6']
-        let startAngle = -Math.PI/2
-        const centerX = pieCanvas.width/2, centerY = pieCanvas.height/2 - 10, radius = 80
-        
-        Object.entries(categories).forEach(([cat,val], i)=>{
-            const sliceAngle = (val/totalInvest) * 2 * Math.PI
-            ctx.beginPath()
-            ctx.moveTo(centerX, centerY)
-            ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle)
-            ctx.closePath()
-            ctx.fillStyle = colors[i % colors.length]
-            ctx.fill()
-            ctx.strokeStyle = document.documentElement.getAttribute('data-theme') === 'dark' ? '#0b1220' : '#ffffff'
-            ctx.lineWidth = 2
-            ctx.stroke()
-            startAngle += sliceAngle
-        })
-        
-        const breakdown = $('categoryBreakdown')
-        breakdown.innerHTML = '<div style="display:grid;gap:8px">' + 
-            Object.entries(categories).map(([cat,val],i)=>{
-                const pct = (val/totalInvest*100).toFixed(1)
-                return `<div style="display:flex;align-items:center;gap:10px">
-                    <div style="width:16px;height:16px;background:${colors[i%colors.length]};border-radius:3px; flex-shrink:0;"></div>
-                    <span style="font-size:13px;"><strong>${cat}:</strong> ${currency(val)} (${pct}%)</span>
-                </div>`
-            }).join('') + '</div>'
-    }
-    
-    // --- Lógica de Tema ---
-    const themeToggle = $('themeToggle')
-    const htmlEl = document.documentElement
+    @media (max-width: 640px) {
+      .app-container {
+        padding: 12px;
+      }
 
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'dark'
-        htmlEl.setAttribute('data-theme', savedTheme)
+      .header {
+        padding: 16px;
+      }
+
+      .header-content h1 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .category-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .stat-value {
+        font-size: 20px;
+      }
+
+      .balance-value {
+        font-size: 28px;
+      }
+
+      .tabs {
+        overflow-x: auto;
+      }
+
+      .tab {
+        white-space: nowrap;
+      }
     }
 
-    function toggleTheme() {
-        const currentTheme = htmlEl.getAttribute('data-theme')
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
-        htmlEl.setAttribute('data-theme', newTheme)
-        localStorage.setItem('theme', newTheme)
-        drawCharts() 
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
     }
 
-    themeToggle.addEventListener('click', toggleTheme)
-    loadTheme()
-    // --- Fim Lógica de Tema ---
-
-    $('years').addEventListener('change', drawCharts)
-    $('reinvest').addEventListener('change', drawCharts)
-    $('monthlyContribution').addEventListener('input', drawCharts)
-    $('considerInflation').addEventListener('change', drawCharts)
-    $('category').addEventListener('change', (e) => {
-        rfDurationRow.style.display = e.target.value === 'Renda Fixa' ? 'flex' : 'none';
-    })
-
-    function resizeCanvas(){ 
-        // Adaptação dos tamanhos para ser mais responsivo, usando o width do container
-        const chartContainerWidth = document.querySelector('#growth-tab').clientWidth;
-
-        chartCanvas.width = chartContainerWidth - 32; // Padding do card
-        chartCanvas.height = 260;
-        pieCanvas.width = chartContainerWidth - 32; 
-        pieCanvas.height = 220;
-        
-        drawCharts(); 
+    ::-webkit-scrollbar-track {
+      background: var(--input-bg);
     }
-    window.addEventListener('resize', resizeCanvas);
-    resizeCanvas();
-    
-    window.editAsset = editAsset;
-    window.deleteAsset = deleteAsset;
-    window.switchTab = (tab) => {
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        
-        const tabEl = document.querySelector(`.tab[onclick*="${tab}"]`);
-        if(tabEl) tabEl.classList.add('active');
-        
-        const contentEl = $(`${tab}-tab`);
-        if(contentEl) contentEl.classList.add('active');
-    };
-    
-    $('category').dispatchEvent(new Event('change'));
-    resetForm();
-  </script>
-</body>
-</html>
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* ANIMATIONS */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card {
+      animation: slideIn 0.4s ease-out;
+    }
+
+    /* LOADING STATE */
+    .loading {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-content">
+        <h1>
+          <span class="card-icon">🚀</span>
+          Simulador Financeiro Pro
+        </h1>
+        <p class="header-subtitle">Gestão Completa de Rendas e Investimentos</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Modo Escuro</span>
+      </button>
+    </header>
+
+    <div class="main-grid">
+      <!-- LEFT COLUMN -->
+      <div>
+        <!-- ASSET FORM -->
+        <section class="card">
+          <div class="card-header">
+            <span class="card-icon">➕</span>
+            <h2 id="formTitle">Adicionar Ativo</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Símbolo</label>
+                <input id="symbol" placeholder="Ex: RZAG11" />
+              </div>
+              <div class="form-group">
+                <label>Quantidade</label>
+                <input id="qty" type="number" min="1" step="1" value="1" />
+              </div>
+              <div class="form-group">
+                <label>Preço (R$)</label>
+                <input id="price" type="number" min="0.01" step="0.01" value="10.00" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Yield Anual (%)</label>
+                <input id="yield" type="number" min="0" step="0.01" value="10.00" />
+              </div>
+              <div class="form-group">
+                <label>Categoria</label>
+                <select id="category">
+                  <option value="FII">FII (Provento Isento)</option>
+                  <option value="Ações">Ações (Provento Isento)</option>
+                  <option value="Renda Fixa">Renda Fixa (IR Regressivo)</option>
+                  <option value="ETF">ETF</option>
+                  <option value="Criptomoedas">Criptomoedas</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Data de Aquisição</label>
+                <input id="purchaseDate" type="date" />
+              </div>
+            </div>
+
+            <div id="rfDurationRow" style="display:none">
+              <div class="form-group">
+                <label>Duração (dias) - Renda Fixa</label>
+                <input id="daysHeld" type="number" min="1" value="721" placeholder="Ex: 721 dias para 15%" />
+              </div>
+            </div>
+
+            <div class="checkbox-group">
+              <input type="checkbox" id="irExempt" />
+              <label for="irExempt">Marcar como Isento de IR</label>
+            </div>
+
+            <div class="btn-group">
+              <button class="btn btn-primary" id="addBtn">
+                ➕ ADICIONAR
+              </button>
+              <button class="btn btn-success" id="updateBtn" style="display:none">
+                ✓ ATUALIZAR
+              </button>
+              <button class="btn btn-secondary" id="presetBtn">
+                🎯 EXEMPLOS
+              </button>
+              <button class="btn btn-danger" id="clearBtn">
+                🗑️ LIMPAR
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- RECURRENT INCOME -->
+        <section class="card">
+          <div class="card-header">
+            <span class="card-icon">💵</span>
+            <h2>Rendas Recorrentes</h2>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tipo de Renda</label>
+                <select id="recurrentIncomeType">
+                  <option value="Kwai/TikTok">Monetização Kwai/TikTok</option>
+                  <option value="99Pay">Rendimento 99Pay/Mercado Pago</option>
+                  <option value="Afiliados">Afiliados/Comissões</option>
+                  <option value="Freelancer">Serviço Freelancer</option>
+                  <option value="Outra">Outra Renda</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Valor (R$)</label>
+                <input type="number" id="recurrentValue" min="0.01" step="0.01" value="50.00" />
+              </div>
+              <div class="form-group">
+                <label>Data</label>
+                <input type="date" id="recurrentDate" />
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="addRecurrentBtn">
+              ➕ REGISTRAR RENDA
+            </button>
+
+            <div class="balance-card">
+              <div class="balance-label">💰 Saldo Total Acumulado</div>
+              <div class="balance-value" id="totalRecurrentIncome">R$ 0,00</div>
+            </div>
+
+            <div class="table-container">
+              <table id="recurrentIncomeTable">
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th class="text-right">Valor</th>
+                    <th class="text-right">Data</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- PORTFOLIO -->
+        <section class="card">
+          <div class="card-header">
+            <span class="card-icon">💼</span>
+            <h2>Carteira de Investimentos</h2>
+          </div>
+
+          <div class="form-group" style="margin-bottom:16px">
+            <label>Filtrar por Categoria</label>
+            <select id="filterCategory">
+              <option value="">Todas as categorias</option>
+              <option value="FII">FII</option>
+              <option value="Ações">Ações</option>
+              <option value="Renda Fixa">Renda Fixa</option>
+              <option value="ETF">ETF</option>
+              <option value="Criptomoedas">Criptomoedas</option>
+              <option value="Outros">Outros</option>
+            </select>
+          </div>
+
+          <div class="table-container">
+            <table id="assetsTable">
+              <thead>
+                <tr>
+                  <th>Ativo</th>
+                  <th>Categoria</th>
+                  <th class="text-right">Qtd</th>
+                  <th class="text-right">Investido</th>
+                  <th class="text-right">% Port.</th>
+                  <th class="text-right">Yield</th>
+                  <th class="text-right">Prov. Líq./ano</th>
+                  <th class="text-right">IR</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total Investido</div>
+              <div class="stat-value" id="totalInvest">R$ 0,00</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Proventos Brutos/Ano</div>
+              <div class="stat-value" id="totalYield">R$ 0,00</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">IR Anual Estimado</div>
+              <div class="stat-value" id="totalIR">R$ 0,00</div>
+            </div>
+            <div class="stat-card stat-card-highlight">
+              <div class="stat-label">Provento Líquido Anual</div>
+              <div class="stat-value" id="netYield">R$ 0,00</div>
+            </div>
+          </div>
+
+          <div class="card-header" style="margin-top:32px; border-bottom:none; padding-bottom:0">
+            <span class="card-icon">📊</span>
+            <h2>Dashboard de Ganhos</h2>
+          </div>
+          <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px">
+            Rendimento líquido por categoria de ativos e rendas recorrentes acumuladas
+          </p>
+
+          <div id="categoryNetStats" class="category-grid"></div>
+
+          <div class="btn-group" style="margin-top:24px">
+            <button class="btn btn-success" id="saveBtn">💾 SALVAR</button>
+            <button class="btn btn-secondary" id="exportBtn">📤 EXPORTAR</button>
+            <button class="btn btn-primary" id="importBtn">📥 IMPORTAR</button>
+            <button class="btn btn-warning" id="resetStorage">⚠️ APAGAR DADOS</button>
+          </div>
+          
