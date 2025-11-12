@@ -1,2606 +1,1710 @@
 <!doctype html>
 <html lang="pt-BR" data-theme="dark">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simulador Financeiro Pro — Rendas e Investimentos</title>
-  <style>
-    /* VARIÁVEIS DE TEMA - DARK MODE */
-    :root {
-      --bg: #0a0e1a;
-      --bg-secondary: #111827;
-      --card: #1a1f2e;
-      --card-hover: #20253a;
-      --accent: #06b6d4;
-      --accent-hover: #0891b2;
-      --accent-light: rgba(6, 182, 212, 0.1);
-      --success: #10b981;
-      --success-light: rgba(16, 185, 129, 0.1);
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text: #f1f5f9;
-      --text-secondary: #cbd5e1;
-      --text-muted: #94a3b8;
-      --border: rgba(255, 255, 255, 0.1);
-      --border-light: rgba(255, 255, 255, 0.05);
-      --input-bg: #0f1419;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.4);
-      --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-      --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      --gradient-bg: linear-gradient(180deg, #0a0e1a 0%, #111827 100%);
-    }
-    
-    /* VARIÁVEIS DE TEMA - LIGHT MODE */
-    [data-theme="light"] {
-      --bg: #f8fafc;
-      --bg-secondary: #f1f5f9;
-      --card: #ffffff;
-      --card-hover: #f8fafc;
-      --accent: #0284c7;
-      --accent-hover: #0369a1;
-      --accent-light: rgba(2, 132, 199, 0.1);
-      --success: #059669;
-      --success-light: rgba(5, 150, 105, 0.1);
-      --warning: #d97706;
-      --danger: #dc2626;
-      --text: #0f172a;
-      --text-secondary: #334155;
-      --text-muted: #64748b;
-      --border: rgba(0, 0, 0, 0.1);
-      --border-light: rgba(0, 0, 0, 0.05);
-      --input-bg: #f8fafc;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
-      --gradient-primary: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%);
-      --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
-      --gradient-bg: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--gradient-bg);
-      color: var(--text);
-      line-height: 1.6;
-      transition: background 0.3s, color 0.3s;
-      min-height: 100vh;
-    }
-
-    .app-container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-
-    /* HEADER */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 24px;
-      margin-bottom: 24px;
-      background: var(--card);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .header-content h1 {
-      font-size: 28px;
-      font-weight: 800;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-subtitle {
-      font-size: 14px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .theme-toggle {
-      padding: 10px 20px;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--text);
-      font-size: 14px;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .theme-toggle:hover {
-      background: var(--card-hover);
-      transform: translateY(-1px);
-    }
-
-    /* GRID LAYOUT */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 480px;
-      gap: 24px;
-    }
-
-    /* CARDS */
-    .card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      transition: all 0.3s;
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-lg);
-      border-color: var(--border);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid var(--border-light);
-    }
-
-    .card-header h2 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      flex: 1;
-    }
-
-    .card-icon {
-      font-size: 24px;
-    }
-
-    /* FORM CONTROLS */
-    .form-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--input-bg);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--accent);
-      background: var(--card);
-      box-shadow: 0 0 0 3px var(--accent-light);
-    }
-
-    input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      accent-color: var(--accent);
-    }
-
-    /* BUTTONS */
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.2s;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: center;
-      font-family: inherit;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .btn-primary {
-      background: var(--gradient-primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
-    }
-
-    .btn-success {
-      background: var(--gradient-success);
-      color: white;
-    }
-
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-warning {
-      background: var(--warning);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #8b5cf6;
-      color: white;
-    }
-
-    .btn-icon {
-      padding: 8px 12px;
-      font-size: 16px;
-      background: var(--input-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-icon:hover {
-      background: var(--card-hover);
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    /* STATS CARDS */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-
-    .stat-card {
-      background: var(--input-bg);
-      padding: 20px;
-      border-radius: 12px;
-      border-left: 4px solid var(--accent);
-      transition: all 0.2s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .stat-card-highlight {
-      background: var(--gradient-success);
-      color: white;
-      border-left-color: white;
-    }
-
-    .stat-card-highlight .stat-label,
-    .stat-card-highlight .stat-value {
-      color: white;
-    }
-
-    /* TABLE */
-    .table-container {
-      overflow-x: auto;
-      margin-top: 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    thead {
-      background: var(--input-bg);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    th {
-      padding: 14px 12px;
-      text-align: left;
-      font-weight: 700;
-      color: var(--accent);
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid var(--border);
-    }
-
-    td {
-      padding: 14px 12px;
-      border-bottom: 1px solid var(--border-light);
-      color: var(--text-secondary);
-    }
-
-    tbody tr {
-      transition: background 0.2s;
-    }
-
-    tbody tr:hover {
-      background: var(--card-hover);
-    }
-
-    .text-right {
-      text-align: right;
-    }
-
-    /* BADGES */
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .badge-success {
-      background: var(--success-light);
-      color: var(--success);
-    }
-
-    .badge-danger {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-    }
-
-    /* TABS */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--border);
-    }
-
-    .tab {
-      padding: 12px 20px;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-      font-weight: 700;
-      color: var(--text-muted);
-      transition: all 0.2s;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .tab:hover {
-      color: var(--text);
-      background: var(--card-hover);
-    }
-
-    .tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* SUGGESTIONS */
-    .suggestion-card {
-      background: var(--input-bg);
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      border: 1px solid var(--border-light);
-      transition: all 0.2s;
-    }
-
-    .suggestion-card:hover {
-      border-color: var(--accent);
-      background: var(--card-hover);
-    }
-
-    .suggestion-content {
-      flex: 1;
-    }
-
-    .suggestion-title {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .suggestion-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    /* BALANCE CARD */
-    .balance-card {
-      background: var(--gradient-success);
-      color: white;
-      padding: 24px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4);
-      margin-top: 20px;
-    }
-
-    .balance-label {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.9;
-      margin-bottom: 8px;
-    }
-
-    .balance-value {
-      font-size: 36px;
-      font-weight: 900;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    /* CHART CONTAINER */
-    .chart-container {
-      background: var(--input-bg);
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-      border: 1px solid var(--border-light);
-    }
-
-    /* CATEGORY STATS */
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
-      padding: 16px;
-      background: var(--input-bg);
-      border-radius: 12px;
-      border: 1px solid var(--border-light);
-      margin-top: 16px;
-    }
-
-    .category-card {
-      padding: 16px;
-      border-radius: 10px;
-      background: var(--card);
-      border-left: 4px solid var(--accent);
-      transition: all 0.2s;
-    }
-
-    .category-card:hover {
-      transform: scale(1.02);
-      box-shadow: var(--shadow);
-    }
-
-    .category-card-external {
-      border-left-color: #8b5cf6;
-    }
-
-    .category-card-total {
-      background: var(--accent-light);
-      border-left-color: var(--success);
-    }
-
-    /* CHECKBOX GROUP */
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px;
-      background: var(--input-bg);
-      border-radius: 10px;
-      border: 1px solid var(--border-light);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .checkbox-group:hover {
-      background: var(--card-hover);
-      border-color: var(--accent);
-    }
-
-    .checkbox-group label {
-      cursor: pointer;
-      margin: 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: none;
-      letter-spacing: normal;
-    }
-
-    /* FOOTER */
-    .footer {
-      text-align: center;
-      padding: 24px;
-      margin-top: 40px;
-      border-top: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 1200px) {
-      .main-grid {
-        grid-template-columns: 1fr 420px;
-      }
-    }
-
-    @media (max-width: 968px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .category-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
-      .app-container {
-        padding: 12px;
-      }
-
-      .header {
-        padding: 16px;
-      }
-
-      .header-content h1 {
-        font-size: 22px;
-      }
-
-      .card {
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .category-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .btn {
-        width: 100%;
-      }
-
-      .stat-value {
-        font-size: 20px;
-      }
-
-      .balance-value {
-        font-size: 28px;
-      }
-
-      .tabs {
-        overflow-x: auto;
-      }
-
-      .tab {
-        white-space: nowrap;
-      }
-    }
-
-    /* SCROLLBAR */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--input-bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-muted);
-    }
-
-    /* ANIMATIONS */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .card {
-      animation: slideIn 0.4s ease-out;
-    }
-
-    /* LOADING STATE */
-    .loading {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Simulador Financeiro Pro — Rendas e Investimentos</title>
+    <style>
+        /* VARIÁVEIS DE TEMA - DARK MODE */
+        :root {
+            --bg: #0a0e1a;
+            --bg-secondary: #111827;
+            --card: #1a1f2e;
+            --card-hover: #20253a;
+            --accent: #06b6d4;
+            --accent-hover: #0891b2;
+            --accent-light: rgba(6, 182, 212, 0.1);
+            --success: #10b981;
+            --success-light: rgba(16, 185, 129, 0.1);
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --border-light: rgba(255, 255, 255, 0.05);
+            --input-bg: #0f1419;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.4);
+            --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --gradient-bg: linear-gradient(180deg, #0a0e1a 0%, #111827 100%);
+        }
+
+        /* VARIÁVEIS DE TEMA - LIGHT MODE */
+        [data-theme="light"] {
+            --bg: #f8fafc;
+            --bg-secondary: #f1f5f9;
+            --card: #ffffff;
+            --card-hover: #f8fafc;
+            --accent: #0284c7;
+            --accent-hover: #0369a1;
+            --accent-light: rgba(2, 132, 199, 0.1);
+            --success: #059669;
+            --success-light: rgba(5, 150, 105, 0.1);
+            --warning: #d97706;
+            --danger: #dc2626;
+            --text: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: rgba(0, 0, 0, 0.1);
+            --border-light: rgba(0, 0, 0, 0.05);
+            --input-bg: #f8fafc;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
+            --gradient-primary: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%);
+            --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
+            --gradient-bg: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background 0.3s, color 0.3s;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px;
+            margin-bottom: 24px;
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .header-content h1 {
+            font-size: 28px;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .theme-toggle {
+            padding: 10px 20px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text);
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--card-hover);
+            transform: translateY(-1px);
+        }
+
+        /* GRID LAYOUT */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 480px;
+            gap: 24px;
+        }
+
+        /* CARDS */
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--border);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text);
+            flex: 1;
+        }
+
+        .card-icon {
+            font-size: 24px;
+        }
+
+        /* FORM CONTROLS */
+        .form-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: var(--card);
+            box-shadow: 0 0 0 3px var(--accent-light);
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            font-family: inherit;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary {
+            background: var(--input-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-hover);
+        }
+
+        .btn-icon {
+            padding: 8px;
+            font-size: 16px;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+        }
+
+        .btn-icon:hover {
+            background: var(--card-hover);
+            color: var(--text);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex-grow: 1;
+        }
+
+        /* CHECKBOX GROUP */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group label {
+            text-transform: none;
+            font-size: 14px;
+            color: var(--text);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* TABLES */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: var(--input-bg);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 14px;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: var(--card);
+            z-index: 10;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            white-space: nowrap;
+        }
+
+        th {
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+        tbody tr:hover {
+            background: var(--card-hover);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* STATS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            padding: 16px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .stat-card-highlight {
+            border-left-color: var(--success);
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-card-highlight .stat-label {
+            color: var(--success);
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .stat-card-highlight .stat-value {
+            color: var(--success);
+        }
+
+        /* CHARTS */
+        .chart-container {
+            background: var(--input-bg);
+            padding: 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        /* SUGGESTIONS */
+        #investmentSuggestions {
+            display: grid;
+            gap: 12px;
+        }
+
+        .suggestion-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .suggestion-title {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .suggestion-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .suggestion-card .btn-secondary {
+            padding: 8px 16px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border-light);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            margin-bottom: -2px; /* Pulls tab border over section border */
+        }
+
+        .tab:hover {
+            color: var(--accent);
+        }
+
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* CATEGORY STATS */
+        #categoryNetStats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .category-card {
+            padding: 16px;
+            background: var(--input-bg);
+            border-radius: 10px;
+            border-left: 3px solid var(--warning);
+        }
+
+        .category-card-external {
+            border-left-color: var(--success);
+        }
+
+        .category-card-total {
+            border-left-color: var(--accent);
+        }
+
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            padding: 24px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-light);
+            margin-top: 24px;
+        }
+
+        /* MEDIA QUERIES */
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="app-container">
-    <!-- HEADER -->
-    <header class="header">
-      <div class="header-content">
-        <h1>
-          <span class="card-icon">🚀</span>
-          Simulador Financeiro Pro
-        </h1>
-        <p class="header-subtitle">Gestão Completa de Rendas e Investimentos</p>
-      </div>
-      <button class="theme-toggle" id="themeToggle">
-        <span id="themeIcon">🌙</span>
-        <span id="themeText">Modo Escuro</span>
-      </button>
-    </header>
 
-    <div class="main-grid">
-      <!-- LEFT COLUMN -->
-      <div>
-        <!-- ASSET FORM -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">➕</span>
-            <h2 id="formTitle">Adicionar Ativo</h2>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Símbolo</label>
-                <input id="symbol" placeholder="Ex: RZAG11" />
-              </div>
-              <div class="form-group">
-                <label>Quantidade</label>
-                <input id="qty" type="number" min="1" step="1" value="1" />
-              </div>
-              <div class="form-group">
-                <label>Preço (R$)</label>
-                <input id="price" type="number" min="0.01" step="0.01" value="10.00" />
-              </div>
+    <div class="app-container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Simulador Financeiro Pro 💰</h1>
+                <div class="header-subtitle">Planejamento de Renda Passiva e Investimentos</div>
             </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Yield Anual (%)</label>
-                <input id="yield" type="number" min="0" step="0.01" value="10.00" />
-              </div>
-              <div class="form-group">
-                <label>Categoria</label>
-                <select id="category">
-                  <option value="FII">FII (Provento Isento)</option>
-                  <option value="Ações">Ações (Provento Isento)</option>
-                  <option value="Renda Fixa">Renda Fixa (IR Regressivo)</option>
-                  <option value="ETF">ETF</option>
-                  <option value="Criptomoedas">Criptomoedas</option>
-                  <option value="Outros">Outros</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Data de Aquisição</label>
-                <input id="purchaseDate" type="date" />
-              </div>
-            </div>
-
-            <div id="rfDurationRow" style="display:none">
-              <div class="form-group">
-                <label>Duração (dias) - Renda Fixa</label>
-                <input id="daysHeld" type="number" min="1" value="721" placeholder="Ex: 721 dias para 15%" />
-              </div>
-            </div>
-
-            <div class="checkbox-group">
-              <input type="checkbox" id="irExempt" />
-              <label for="irExempt">Marcar como Isento de IR</label>
-            </div>
-
             <div class="btn-group">
-              <button class="btn btn-primary" id="addBtn">
-                ➕ ADICIONAR
-              </button>
-              <button class="btn btn-success" id="updateBtn" style="display:none">
-                ✓ ATUALIZAR
-              </button>
-              <button class="btn btn-secondary" id="presetBtn">
-                🎯 EXEMPLOS
-              </button>
-              <button class="btn btn-danger" id="clearBtn">
-                🗑️ LIMPAR
-              </button>
+                <button id="importBtn" class="btn btn-secondary">📥 IMPORTAR</button>
+                <button id="exportBtn" class="btn btn-secondary">📤 EXPORTAR</button>
+                <button id="saveBtn" class="btn btn-secondary">💾 SALVAR</button>
+                <button id="resetStorage" class="btn btn-icon">🔥</button>
+                <button id="themeToggle" class="theme-toggle">🌙 Escuro</button>
             </div>
-          </div>
-        </section>
+        </header>
 
-        <!-- RECURRENT INCOME -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">💵</span>
-            <h2>Rendas Recorrentes</h2>
-          </div>
+        <div class="main-grid">
 
-          <div class="form-grid">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Tipo de Renda</label>
-                <select id="recurrentIncomeType">
-                  <option value="Kwai/TikTok">Monetização Kwai/TikTok</option>
-                  <option value="99Pay">Rendimento 99Pay/Mercado Pago</option>
-                  <option value="Afiliados">Afiliados/Comissões</option>
-                  <option value="Freelancer">Serviço Freelancer</option>
-                  <option value="Outra">Outra Renda</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Valor (R$)</label>
-                <input type="number" id="recurrentValue" min="0.01" step="0.01" value="50.00" />
-              </div>
-              <div class="form-group">
-                <label>Data</label>
-                <input type="date" id="recurrentDate" />
-              </div>
-            </div>
+            <div>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">➕</span>
+                        <h2 id="formTitle">Adicionar Ativo</h2>
+                    </div>
 
-            <button class="btn btn-primary" id="addRecurrentBtn">
-              ➕ REGISTRAR RENDA
-            </button>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Símbolo / Título</label>
+                                <input type="text" id="symbol" placeholder="Ex: MXRF11, Tesouro Selic, CDB..." />
+                            </div>
+                            <div class="form-group">
+                                <label>Categoria</label>
+                                <select id="category">
+                                    <option value="FII">Fundo Imobiliário (FII)</option>
+                                    <option value="Ações">Ações</option>
+                                    <option value="Renda Fixa">Renda Fixa</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Qtde</label>
+                                <input type="number" id="qty" min="1" value="1" />
+                            </div>
+                        </div>
 
-            <div class="balance-card">
-              <div class="balance-label">💰 Saldo Total Acumulado</div>
-              <div class="balance-value" id="totalRecurrentIncome">R$ 0,00</div>
-            </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Preço (R$)</label>
+                                <input type="number" id="price" min="0" step="0.01" value="10.00" />
+                            </div>
+                            <div class="form-group">
+                                <label>Yield/Rendimento Anual (%)</label>
+                                <input type="number" id="yield" min="0" step="0.01" value="10.00" />
+                            </div>
+                            <div class="form-group" id="daysHeldGroup" style="display:none">
+                                <label>Dias de Posse (IR Regressivo)</label>
+                                <input type="number" id="daysHeld" min="1" value="721" />
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Data de Compra</label>
+                                <input type="date" id="purchaseDate" value="2024-11-12" />
+                            </div>
+                            <div class="checkbox-group" style="align-self: flex-end;">
+                                <input type="checkbox" id="irExempt" />
+                                <label for="irExempt">Provento Isento de IR</label>
+                            </div>
+                        </div>
 
-            <div class="table-container">
-              <table id="recurrentIncomeTable">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th class="text-right">Valor</th>
-                    <th class="text-right">Data</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+                        <div class="btn-group">
+                            <button id="addBtn" class="btn btn-primary">ADICIONAR ATIVO</button>
+                            <button id="updateBtn" class="btn btn-success" style="display:none">ATUALIZAR ATIVO</button>
+                            <button id="resetFormBtn" class="btn btn-secondary" onclick="resetForm()">LIMPAR FORM</button>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- PORTFOLIO -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">💼</span>
-            <h2>Carteira de Investimentos</h2>
-          </div>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💼</span>
+                        <h2>Carteira de Ativos</h2>
+                        <button id="presetBtn" class="btn btn-secondary" style="margin-left:auto">Exemplos</button>
+                        <button id="clearBtn" class="btn btn-icon">🧹</button>
+                    </div>
 
-          <div class="form-group" style="margin-bottom:16px">
-            <label>Filtrar por Categoria</label>
-            <select id="filterCategory">
-              <option value="">Todas as categorias</option>
-              <option value="FII">FII</option>
-              <option value="Ações">Ações</option>
-              <option value="Renda Fixa">Renda Fixa</option>
-              <option value="ETF">ETF</option>
-              <option value="Criptomoedas">Criptomoedas</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Investido Total</div>
+                            <div class="stat-value" id="totalInvest">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color:var(--success)">
+                            <div class="stat-label">Provento Líquido Anual</div>
+                            <div class="stat-value" id="netYield">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Provento Bruto Anual</div>
+                            <div class="stat-value" id="totalYield">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color:var(--danger)">
+                            <div class="stat-label">IR Total Anual</div>
+                            <div class="stat-value" id="totalIR">R$ 0,00</div>
+                        </div>
+                    </div>
 
-          <div class="table-container">
-            <table id="assetsTable">
-              <thead>
-                <tr>
-                  <th>Ativo</th>
-                  <th>Categoria</th>
-                  <th class="text-right">Qtd</th>
-                  <th class="text-right">Investido</th>
-                  <th class="text-right">% Port.</th>
-                  <th class="text-right">Yield</th>
-                  <th class="text-right">Prov. Líq./ano</th>
-                  <th class="text-right">IR</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
+                    <div id="categoryNetStats" class="stats-grid">
+                        </div>
 
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">Total Investido</div>
-              <div class="stat-value" id="totalInvest">R$ 0,00</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Proventos Brutos/Ano</div>
-              <div class="stat-value" id="totalYield">R$ 0,00</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">IR Anual Estimado</div>
-              <div class="stat-value" id="totalIR">R$ 0,00</div>
-            </div>
-            <div class="stat-card stat-card-highlight">
-              <div class="stat-label">Provento Líquido Anual</div>
-              <div class="stat-value" id="netYield">R$ 0,00</div>
-            </div>
-          </div>
+                    <div class="table-container" style="margin-top:24px">
+                        <table id="assetsTable">
+                            <thead>
+                                <tr>
+                                    <th>Ativo</th>
+                                    <th>Cat.</th>
+                                    <th class="text-right">Qtde</th>
+                                    <th class="text-right">Investido</th>
+                                    <th class="text-right">% Carteira</th>
+                                    <th class="text-right">Yield (%)</th>
+                                    <th class="text-right">Prov. Líq. Anual</th>
+                                    <th class="text-right">IR</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
 
-          <div class="card-header" style="margin-top:32px; border-bottom:none; padding-bottom:0">
-            <span class="card-icon">📊</span>
-            <h2>Dashboard de Ganhos</h2>
-          </div>
-          <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px">
-            Rendimento líquido por categoria de ativos e rendas recorrentes acumuladas
-          </p>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💵</span>
+                        <h2>Rendas Recorrentes (Extra)</h2>
+                    </div>
 
-          <div id="categoryNetStats" class="category-grid"></div>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tipo de Renda</label>
+                                <input type="text" id="recurrentIncomeType" value="Freelancer" placeholder="Ex: Serviços, Vendas, Aluguel..." />
+                            </div>
+                            <div class="form-group">
+                                <label>Valor (R$)</label>
+                                <input type="number" id="recurrentValue" min="0" step="10.00" value="50.00" />
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Recebimento</label>
+                                <input type="date" id="recurrentDate" value="2025-11-12" />
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button id="addRecurrentBtn" class="btn btn-secondary">ADICIONAR RENDA</button>
+                        </div>
+                    </div>
 
-          <div class="btn-group" style="margin-top:24px">
-            <button class="btn btn-success" id="saveBtn">💾 SALVAR</button>
-            <button class="btn btn-secondary" id="exportBtn">📤 EXPORTAR</button>
-            <button class="btn btn-primary" id="importBtn">📥 IMPORTAR</button>
-            <button class="btn btn-warning" id="resetStorage">⚠️ APAGAR DADOS</button>
-          </div>
-          <input type="file" id="importFile" accept=".csv" style="display:none" />
-          <input type="file" id="importFile" accept=".csv" style="display:none" />
-        </section>
-      </div>
-
-      <!-- RIGHT COLUMN -->
-      <aside>
-        <!-- SIMULATION CONFIG -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">🎯</span>
-            <h2>Configuração da Simulação</h2>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Horizonte</label>
-                <select id="years">
-                  <option value="1">1 ano</option>
-                  <option value="3">3 anos</option>
-                  <option value="5" selected>5 anos</option>
-                  <option value="10">10 anos</option>
-                  <option value="15">15 anos</option>
-                  <option value="20">20 anos</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Aporte Mensal (R$)</label>
-                <input type="number" id="monthlyContribution" min="0" step="100" value="500" />
-              </div>
+                    <h3 style="margin-top:24px; font-size:16px; font-weight:700">Histórico de Rendas</h3>
+                    <div class="table-container" style="margin-top:16px">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th class="text-right">Valor</th>
+                                    <th class="text-right">Data</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recurrentIncomeTable">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div style="text-align:right; margin-top:12px; font-weight:700; color:var(--text-secondary)">
+                        Total Recorrente (Aportado): <span id="totalRecurrentIncome">R$ 0,00</span>
+                    </div>
+                </section>
+                <input type="file" id="importFile" accept=".csv" style="display:none" />
             </div>
 
-            <div class="checkbox-group">
-              <input type="checkbox" id="reinvest" checked />
-              <label for="reinvest">Reinvestir proventos líquidos</label>
-            </div>
+            <aside>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🎯</span>
+                        <h2>Configuração da Simulação</h2>
+                    </div>
 
-            <div class="checkbox-group">
-              <input type="checkbox" id="considerInflation" />
-              <label for="considerInflation">Considerar inflação (IPCA 4,5% a.a.)</label>
-            </div>
-          </div>
-        </section>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Horizonte</label>
+                                <select id="years">
+                                    <option value="1">1 ano</option>
+                                    <option value="3">3 anos</option>
+                                    <option value="5" selected>5 anos</option>
+                                    <option value="10">10 anos</option>
+                                    <option value="15">15 anos</option>
+                                    <option value="20">20 anos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Aporte Mensal (R$)</label>
+                                <input type="number" id="monthlyContribution" min="0" step="100" value="500" />
+                            </div>
+                        </div>
 
-        <!-- INVESTMENT SUGGESTIONS -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">💡</span>
-            <h2>Sugestões de Investimento</h2>
-          </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="reinvest" checked />
+                            <label for="reinvest">Reinvestir proventos líquidos</label>
+                        </div>
 
-          <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px">
-            Adicione exemplos para simular diferentes estratégias:
-          </p>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="considerInflation" />
+                            <label for="considerInflation">Considerar inflação (IPCA 4,5% a.a.)</label>
+                        </div>
+                    </div>
+                </section>
 
-          <div id="investmentSuggestions">
-            <div class="suggestion-card">
-              <div class="suggestion-content">
-                <div class="suggestion-title">🏦 CDB 110% CDI</div>
-                <div class="suggestion-desc">Renda Fixa • IR Regressivo (22.5% → 15%)</div>
-              </div>
-              <button class="btn btn-secondary" onclick="addExample('CDB110', 1000, 1, 'Renda Fixa', 13.5, 721)">
-                ADICIONAR
-              </button>
-            </div>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💡</span>
+                        <h2>Sugestões de Investimento</h2>
+                    </div>
 
-            <div class="suggestion-card">
-              <div class="suggestion-content">
-                <div class="suggestion-title">📝 LCA/LCI (Isento)</div>
-                <div class="suggestion-desc">Renda Fixa • Isento de IR</div>
-              </div>
-              <button class="btn btn-secondary" onclick="addExample('LCA95', 1000, 1, 'Renda Fixa', 11.8, 0, true)">
-                ADICIONAR
-              </button>
-            </div>
+                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px">
+                        Adicione exemplos para simular diferentes estratégias:
+                    </p>
 
-            <div class="suggestion-card">
-              <div class="suggestion-content">
-                <div class="suggestion-title">📈 Ação PETR4</div>
-                <div class="suggestion-desc">Ações • Provento Isento</div>
-              </div>
-              <button class="btn btn-secondary" onclick="addExample('PETR4', 1, 35.00, 'Ações', 12.0)">
-                ADICIONAR
-              </button>
-            </div>
+                    <div id="investmentSuggestions">
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">🏦 CDB 110% CDI</div>
+                                <div class="suggestion-desc">Renda Fixa • IR Regressivo (22.5% → 15%)</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('CDB110', 1000, 1, 'Renda Fixa', 13.5, 721)">
+                                ADICIONAR
+                            </button>
+                        </div>
 
-            <div class="suggestion-card">
-              <div class="suggestion-content">
-                <div class="suggestion-title">🏢 FII MXRF11</div>
-                <div class="suggestion-desc">FII • Provento Isento</div>
-              </div>
-              <button class="btn btn-secondary" onclick="addExample('MXRF11', 1, 10.00, 'FII', 12.7)">
-                ADICIONAR
-              </button>
-            </div>
-          </div>
-        </section>
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">📝 LCA/LCI (Isento)</div>
+                                <div class="suggestion-desc">Renda Fixa • Isento de IR</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('LCA95', 1000, 1, 'Renda Fixa', 11.8, 0, true)">
+                                ADICIONAR
+                            </button>
+                        </div>
 
-        <!-- INCOME IDEAS -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">💰</span>
-            <h2>Ideias de Renda Extra</h2>
-          </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">📈 Ação PETR4</div>
+                                <div class="suggestion-desc">Ações • Provento Isento</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('PETR4', 1, 35.00, 'Ações', 12.0)">
+                                ADICIONAR
+                            </button>
+                        </div>
 
-          <div style="display:grid; gap:16px">
-            <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--accent)">
-              <div style="font-weight:700; color:var(--text); margin-bottom:4px">
-                🎨 Gestão de Redes Sociais
-              </div>
-              <div style="font-size:13px; color:var(--text-muted)">
-                Pacotes mensais para pequenos negócios
-              </div>
-            </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">🏢 FII MXRF11</div>
+                                <div class="suggestion-desc">FII • Provento Isento</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('MXRF11', 1, 10.00, 'FII', 12.7)">
+                                ADICIONAR
+                            </button>
+                        </div>
+                    </div>
+                </section>
 
-            <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--success)">
-              <div style="font-weight:700; color:var(--text); margin-bottom:4px">
-                📱 Afiliados + Tráfego Pago
-              </div>
-              <div style="font-size:13px; color:var(--text-muted)">
-                Escale vendas com anúncios direcionados
-              </div>
-            </div>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💰</span>
+                        <h2>Ideias de Renda Extra</h2>
+                    </div>
 
-            <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--warning)">
-              <div style="font-weight:700; color:var(--text); margin-bottom:4px">
-                📚 Cursos e E-books
-              </div>
-              <div style="font-size:13px; color:var(--text-muted)">
-                Monetize seu conhecimento digital
-              </div>
-            </div>
-          </div>
-        </section>
+                    <div style="display:grid; gap:16px">
+                        <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--accent)">
+                            <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                                🎨 Gestão de Redes Sociais
+                            </div>
+                            <div style="font-size:13px; color:var(--text-muted)">
+                                Pacotes mensais para pequenos negócios
+                            </div>
+                        </div>
 
-        <!-- PROJECTION TABS -->
-        <section class="card">
-          <div class="tabs">
-            <div class="tab active" onclick="switchTab('growth')">📊 Crescimento</div>
-            <div class="tab" onclick="switchTab('monthly')">📅 Detalhes</div>
-          </div>
+                        <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--success)">
+                            <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                                📱 Afiliados + Tráfego Pago
+                            </div>
+                            <div style="font-size:13px; color:var(--text-muted)">
+                                Escale vendas com anúncios direcionados
+                            </div>
+                        </div>
 
-          <!-- GROWTH TAB -->
-          <div id="growth-tab" class="tab-content active">
-            <h3 style="color:var(--text); font-size:18px; font-weight:700; margin-bottom:16px">
-              Projeção Final (<span id="yearsDisplay">5</span> Anos)
-            </h3>
+                        <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--warning)">
+                            <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                                📚 Cursos e E-books
+                            </div>
+                            <div style="font-size:13px; color:var(--text-muted)">
+                                Monetize seu conhecimento digital
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-            <div class="stats-grid" style="grid-template-columns:1fr 1fr">
-              <div class="stat-card">
-                <div class="stat-label">Patrimônio Final</div>
-                <div class="stat-value" id="projectedNetYield">R$ 0,00</div>
-              </div>
-              <div class="stat-card" style="border-left-color:var(--success)">
-                <div class="stat-label">Ganhos Totais</div>
-                <div class="stat-value" id="projectedGrossYield">R$ 0,00</div>
-              </div>
-              <div class="stat-card" style="border-left-color:var(--danger)">
-                <div class="stat-label">IR Total Pago</div>
-                <div class="stat-value" id="projectedIRPaid">R$ 0,00</div>
-              </div>
-              <div class="stat-card stat-card-highlight">
-                <div class="stat-label">Renda Passiva Mensal</div>
-                <div class="stat-value" id="monthlyPassiveIncome">R$ 0,00</div>
-              </div>
-            </div>
+                <section class="card">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('growth')">📊 Crescimento</div>
+                        <div class="tab" onclick="switchTab('monthly')">📅 Detalhes</div>
+                    </div>
 
-            <div class="chart-container">
-              <canvas id="growthChart" width="450" height="280"></canvas>
-            </div>
+                    <div id="growth-tab" class="tab-content active">
+                        <h3 style="color:var(--text); font-size:18px; font-weight:700; margin-bottom:16px">
+                            Projeção Final (<span id="yearsDisplay">5</span> Anos)
+                        </h3>
 
-            <h3 style="color:var(--text); font-size:18px; font-weight:700; margin:24px 0 16px">
-              Diversificação da Carteira
-            </h3>
+                        <div class="stats-grid" style="grid-template-columns:1fr 1fr">
+                            <div class="stat-card">
+                                <div class="stat-label">Patrimônio Final</div>
+                                <div class="stat-value" id="projectedNetYield">R$ 0,00</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color:var(--success)">
+                                <div class="stat-label">Ganhos Totais</div>
+                                <div class="stat-value" id="projectedGrossYield">R$ 0,00</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color:var(--danger)">
+                                <div class="stat-label">IR Total Pago</div>
+                                <div class="stat-value" id="projectedIRPaid">R$ 0,00</div>
+                            </div>
+                            <div class="stat-card stat-card-highlight">
+                                <div class="stat-label">Renda Passiva Mensal</div>
+                                <div class="stat-value" id="monthlyPassiveIncome">R$ 0,00</div>
+                            </div>
+                        </div>
 
-            <div class="chart-container" style="background:none; border:none; padding:0">
-              <canvas id="pieChart" width="450" height="240"></canvas>
-            </div>
-            <div id="categoryBreakdown" style="margin-top:16px; padding:16px; background:var(--input-bg); border-radius:10px; font-size:13px"></div>
-          </div>
+                        <div class="chart-container">
+                            <canvas id="growthChart" width="450" height="280"></canvas>
+                        </div>
 
-          <!-- MONTHLY TAB -->
-          <div id="monthly-tab" class="tab-content">
-            <div class="table-container" style="max-height:500px; overflow-y:auto">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Mês</th>
-                    <th class="text-right">Patrimônio</th>
-                    <th class="text-right">Aporte</th>
-                    <th class="text-right">Prov. Bruto</th>
-                    <th class="text-right">IR</th>
-                    <th class="text-right">Prov. Líq.</th>
-                  </tr>
-                </thead>
-                <tbody id="monthlyProjectionBody"></tbody>
-              </table>
-            </div>
+                        <h3 style="color:var(--text); font-size:18px; font-weight:700; margin:24px 0 16px">
+                            Diversificação da Carteira
+                        </h3>
 
-            <div id="monthlyStats" style="margin-top:16px; padding:16px; background:var(--success-light); border-radius:10px; font-size:13px; color:var(--text-secondary)"></div>
-          </div>
-        </section>
-      </aside>
+                        <div class="chart-container" style="background:none; border:none; padding:0">
+                            <canvas id="pieChart" width="450" height="240"></canvas>
+                        </div>
+                        <div id="categoryBreakdown" style="margin-top:16px; padding:16px; background:var(--input-bg); border-radius:10px; font-size:13px"></div>
+                    </div>
+
+                    <div id="monthly-tab" class="tab-content">
+                        <div class="table-container" style="max-height:500px; overflow-y:auto">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mês</th>
+                                        <th class="text-right">Patrimônio</th>
+                                        <th class="text-right">Aporte</th>
+                                        <th class="text-right">Prov. Bruto</th>
+                                        <th class="text-right">IR</th>
+                                        <th class="text-right">Prov. Líq.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyProjectionBody"></tbody>
+                            </table>
+                        </div>
+
+                        <div id="monthlyStats" style="margin-top:16px; padding:16px; background:var(--success-light); border-radius:10px; font-size:13px; color:var(--text-secondary)"></div>
+                    </div>
+                </section>
+            </aside>
+        </div>
+
+        <footer class="footer">
+            <strong>Simulador Financeiro Pro v2.0</strong> — Ferramenta educacional para planejamento financeiro
+        </footer>
     </div>
 
-    <!-- FOOTER -->
-    <footer class="footer">
-      <strong>Simulador Financeiro Pro v2.0</strong> — Ferramenta educacional para planejamento financeiro
-    </footer>
-  </div>
-
-  <script>
-    // UTILITIES
-    const $ = id => document.getElementById(id);
-    const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
-    const formatDate = dateString => {
-      if (!dateString) return 'N/A';
-      const [year, month, day] = dateString.split('-');
-      return `${day}/${month}/${year}`;
-    };
-
-    // STATE
-    let assets = [];
-    let recurrentIncomes = [];
-    let filterCategory = '';
-    let editingIndex = -1;
-
-    // DOM ELEMENTS
-    const tbody = document.querySelector('#assetsTable tbody');
-    const recurrentTbody = document.querySelector('#recurrentIncomeTable tbody');
-    const totalInvestEl = $('totalInvest');
-    const totalYieldEl = $('totalYield');
-    const totalIREl = $('totalIR');
-    const netYieldEl = $('netYield');
-    const categoryNetStatsEl = $('categoryNetStats');
-    const projectedGrossYieldEl = $('projectedGrossYield');
-    const projectedIRPaidEl = $('projectedIRPaid');
-    const projectedNetYieldEl = $('projectedNetYield');
-    const monthlyPassiveIncomeEl = $('monthlyPassiveIncome');
-    const totalRecurrentIncomeEl = $('totalRecurrentIncome');
-    const chartCanvas = $('growthChart');
-    const pieCanvas = $('pieChart');
-
-    // IR CALCULATION
-    function calculateIR(income, category, irExempt, daysHeld) {
-      if (irExempt || category === 'FII' || category === 'Ações') return 0;
-      
-      let rate = 0.15;
-
-      if (category === 'Renda Fixa' && daysHeld > 0) {
-        if (daysHeld <= 180) rate = 0.225;
-        else if (daysHeld <= 360) rate = 0.20;
-        else if (daysHeld <= 720) rate = 0.175;
-        else rate = 0.15;
-      }
-
-      return income * rate;
-    }
-
-    function getAssetNetProvento(a) {
-      const invested = a.qty * a.price;
-      const provento = invested * (a.yield/100);
-      const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
-      return provento - ir;
-    }
-
-    function getTotalRecurrentBalance() {
-      return recurrentIncomes.reduce((sum, r) => sum + r.value, 0);
-    }
-
-    // RENDER RECURRENT TABLE
-    function renderRecurrentTable() {
-      recurrentTbody.innerHTML = '';
-      const sortedRendas = [...recurrentIncomes].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      sortedRendas.forEach((r) => {
-        const originalIndex = recurrentIncomes.indexOf(r);
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><strong>${r.type}</strong></td>
-          <td class="text-right">${currency(r.value)}</td>
-          <td class="text-right">${formatDate(r.date)}</td>
-          <td>
-            <button class="btn btn-icon" onclick="deleteRecurrent(${originalIndex})">🗑️</button>
-          </td>
-        `;
-        recurrentTbody.appendChild(tr);
-      });
-      
-      totalRecurrentIncomeEl.textContent = currency(getTotalRecurrentBalance());
-      drawCharts();
-    }
-
-    // ADD RECURRENT INCOME
-    $('addRecurrentBtn').addEventListener('click', () => {
-      const type = $('recurrentIncomeType').value;
-      const value = Number($('recurrentValue').value);
-      const date = $('recurrentDate').value;
-
-      if (value <= 0) return alert('O valor deve ser maior que zero.');
-      if (!date) return alert('Selecione a data de recebimento.');
-
-      recurrentIncomes.push({ type, value, date });
-      renderRecurrentTable();
-      
-      $('recurrentValue').value = '50.00';
-      $('recurrentDate').value = new Date().toISOString().split('T')[0];
-    });
-
-    window.deleteRecurrent = function(index) {
-      if (confirm('Remover este pagamento de renda?')) {
-        recurrentIncomes.splice(index, 1);
-        renderRecurrentTable();
-      }
-    };
-
-    // ADD EXAMPLE ASSET
-    window.addExample = function(symbol, qty, price, category, yieldPerc, daysHeld = 0, isExempt = false) {
-      const finalPrice = (category === 'Renda Fixa' && symbol.includes('CDB')) ? 1.00 : Number(price);
-      const finalQty = (category === 'Renda Fixa' && symbol.includes('CDB')) ? Number(qty) * price : Number(qty);
-
-      const newAsset = {
-        symbol,
-        qty: finalQty,
-        price: finalPrice,
-        yield: Number(yieldPerc),
-        category,
-        irExempt: isExempt || category === 'FII' || category === 'Ações',
-        daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
-        purchaseDate: new Date().toISOString().split('T')[0]
-      };
-
-      assets.push(newAsset);
-      renderTable();
-      alert(`✅ ${symbol} adicionado à carteira!`);
-    };
-
-    // RENDER CATEGORY STATS
-    function renderCategoryNetStats() {
-      const categories = {};
-      let totalNetAnnual = 0;
-      
-      assets.forEach(a => {
-        const category = a.category;
-        const invested = a.qty * a.price;
-        const netProvento = getAssetNetProvento(a);
-        
-        if (!categories[category]) {
-          categories[category] = { invested: 0, netYield: 0, isExternal: false };
-        }
-        categories[category].invested += invested;
-        categories[category].netYield += netProvento;
-        totalNetAnnual += netProvento;
-      });
-
-      const oneYearAgo = new Date();
-      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-      const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
-      
-      const externalYields = relevantRendas.reduce((acc, r) => {
-        acc[r.type] = (acc[r.type] || 0) + r.value;
-        return acc;
-      }, {});
-      
-      Object.entries(externalYields).forEach(([type, value]) => {
-        const key = `Renda_${type}`;
-        categories[key] = {
-          invested: 0,
-          netYield: value,
-          isExternal: true,
-          type: type,
-          label: 'Acumulado 12 meses'
+    <script>
+        // UTILITIES
+        const $ = id => document.getElementById(id);
+        const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+        const formatDate = dateString => {
+            if (!dateString) return 'N/A';
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
         };
-      });
 
-      let html = '';
-      
-      Object.entries(categories).forEach(([key, data]) => {
-        if (data.isExternal) {
-          html += `
-            <div class="category-card category-card-external">
-              <div class="stat-label">💵 ${data.type}</div>
-              <div class="stat-value">${currency(data.netYield)}</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:4px">${data.label}</div>
-            </div>
-          `;
-        } else {
-          html += `
-            <div class="category-card">
-              <div class="stat-label">${key}</div>
-              <div class="stat-value">${currency(data.netYield)}</div>
-              <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Investido: ${currency(data.invested)}</div>
-            </div>
-          `;
-        }
-      });
+        // STATE
+        let assets = [];
+        let recurrentIncomes = [];
+        let filterCategory = '';
+        let editingIndex = -1;
 
-      const totalInvestedFromAssets = assets.reduce((s,a)=>s + a.qty*a.price, 0);
-      html += `
-        <div class="category-card category-card-total">
-          <div class="stat-label">💎 TOTAL (ATIVOS)</div>
-          <div class="stat-value">${currency(totalNetAnnual)}</div>
-          <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Patrimônio: ${currency(totalInvestedFromAssets)}</div>
-        </div>
-      `;
-
-      categoryNetStatsEl.innerHTML = html;
-    }
-
-    // RENDER TABLE
-    function renderTable() {
-      tbody.innerHTML = '';
-      
-      const allInvest = assets.reduce((s,a)=>s+a.qty*a.price,0);
-      let allYield = 0, allIR = 0;
-      
-      assets.forEach(a => {
-        const invested = a.qty * a.price;
-        const provento = invested * (a.yield/100);
-        const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
+        // DOM ELEMENTS
+        const tbody = document.querySelector('#assetsTable tbody');
+        const recurrentTbody = document.querySelector('#recurrentIncomeTable tbody');
+        const totalInvestEl = $('totalInvest');
+        const totalYieldEl = $('totalYield');
+        const totalIREl = $('totalIR');
+        const netYieldEl = $('netYield');
+        const categoryNetStatsEl = $('categoryNetStats');
+        const projectedGrossYieldEl = $('projectedGrossYield');
+        const projectedIRPaidEl = $('projectedIRPaid');
+        const projectedNetYieldEl = $('projectedNetYield');
+        const monthlyPassiveIncomeEl = $('monthlyPassiveIncome');
+        const totalRecurrentIncomeEl = $('totalRecurrentIncome');
+        const chartCanvas = $('growthChart');
+        const pieCanvas = $('pieChart');
+        const themeToggleBtn = $('themeToggle');
         
-        allYield += provento;
-        allIR += ir;
-      });
-
-      const filteredAssets = filterCategory ? assets.filter(a => a.category === filterCategory) : assets;
-      
-      filteredAssets.forEach((a) => {
-        const invested = a.qty * a.price;
-        const provento = invested * (a.yield/100);
-        const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
-        const netProvento = provento - ir;
-        const percentage = allInvest ? (invested / allInvest * 100) : 0;
+        // THEME TOGGLE
+        themeToggleBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            themeToggleBtn.innerHTML = newTheme === 'dark' ? '🌙 Escuro' : '☀️ Claro';
+        });
         
-        const isExemptByRule = a.category === 'FII' || a.category === 'Ações' || a.irExempt;
-        const badgeClass = isExemptByRule ? 'badge-success' : 'badge-danger';
-        const irText = isExemptByRule ? 'Isento' : currency(ir);
-        
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><strong>${a.symbol}</strong></td>
-          <td><span class="badge">${a.category}</span></td>
-          <td class="text-right">${a.qty}</td>
-          <td class="text-right">${currency(invested)}</td>
-          <td class="text-right">${percentage.toFixed(1)}%</td>
-          <td class="text-right">${a.yield.toFixed(2)}%</td>
-          <td class="text-right">${currency(netProvento)}</td>
-          <td class="text-right"><span class="badge ${badgeClass}">${irText}</span></td>
-          <td>
-            <button class="btn btn-icon" onclick="editAsset(${assets.indexOf(a)})">✏️</button>
-            <button class="btn btn-icon" onclick="deleteAsset(${assets.indexOf(a)})">🗑️</button>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-      
-      const netYield = allYield - allIR;
-      
-      totalInvestEl.textContent = currency(allInvest);
-      totalYieldEl.textContent = currency(allYield);
-      totalIREl.textContent = currency(allIR);
-      netYieldEl.textContent = currency(netYield);
-      
-      drawCharts();
-      renderCategoryNetStats();
-    }
+        // Initial theme check (in case user has a preference saved elsewhere, otherwise default to dark)
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            themeToggleBtn.innerHTML = currentTheme === 'dark' ? '🌙 Escuro' : '☀️ Claro';
+            $('purchaseDate').value = new Date().toISOString().split('T')[0];
+            $('recurrentDate').value = new Date().toISOString().split('T')[0];
+        });
 
-    // PROCESS ASSET
-    function processAsset() {
-      const symbol = $('symbol').value.trim().toUpperCase();
-      const qty = $('qty').value;
-      const price = $('price').value;
-      const yieldPerc = $('yield').value;
-      const category = $('category').value;
-      const irExempt = $('irExempt').checked;
-      const daysHeld = $('daysHeld').value;
-      const purchaseDate = $('purchaseDate').value;
 
-      if(!symbol) return alert('Preencha o símbolo');
-      if(Number(qty) <= 0 || Number(price) <= 0) return alert('Quantidade e Preço devem ser maiores que zero.');
+        // IR CALCULATION
+        function calculateIR(income, category, irExempt, daysHeld) {
+            if (irExempt || category === 'FII' || category === 'Ações') return 0;
+            
+            let rate = 0.15;
 
-      const newAsset = {
-        symbol,
-        qty:Number(qty),
-        price:Number(price),
-        yield:Number(yieldPerc),
-        category: category || 'Outros',
-        irExempt: Boolean(irExempt),
-        daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
-        purchaseDate: purchaseDate
-      };
-      
-      if(editingIndex !== -1) {
-        assets[editingIndex] = newAsset;
-      } else {
-        assets.push(newAsset);
-      }
-
-      renderTable();
-      resetForm();
-    }
-
-    // RESET FORM
-    function resetForm() {
-      $('symbol').value='';
-      $('qty').value=1;
-      $('price').value=10.00;
-      $('yield').value=10.00;
-      $('category').value='FII';
-      $('irExempt').checked=false;
-      $('daysHeld').value=721;
-      $('purchaseDate').value = new Date().toISOString().split('T')[0];
-      
-      editingIndex = -1;
-      $('addBtn').style.display = 'inline-flex';
-      $('updateBtn').style.display = 'none';
-      $('formTitle').textContent = 'Adicionar Ativo';
-      
-      $('category').dispatchEvent(new Event('change'));
-    }
-
-    // EDIT ASSET
-    window.editAsset = function(index) {
-      const a = assets[index];
-      
-      $('symbol').value = a.symbol;
-      $('qty').value = a.qty;
-      $('price').value = a.price;
-      $('yield').value = a.yield;
-      $('category').value = a.category;
-      $('irExempt').checked = a.irExempt;
-      $('daysHeld').value = a.daysHeld || 721;
-      $('purchaseDate').value = a.purchaseDate || new Date().toISOString().split('T')[0];
-      
-      $('category').dispatchEvent(new Event('change'));
-
-      $('addBtn').style.display = 'none';
-      $('updateBtn').style.display = 'inline-flex';
-      $('formTitle').textContent = `Editando: ${a.symbol}`;
-      editingIndex = index;
-    };
-
-    // DELETE ASSET
-    window.deleteAsset = function(index) {
-      if(confirm(`Remover ${assets[index].symbol}?`)){
-        assets.splice(index, 1);
-        renderTable();
-        resetForm();
-      }
-    };
-
-    // EVENT LISTENERS
-    $('addBtn').addEventListener('click', processAsset);
-    $('updateBtn').addEventListener('click', processAsset);
-    
-    $('presetBtn').addEventListener('click', ()=>{
-      resetForm();
-      assets.push({symbol: 'RZAG11', qty: 2, price: 9.00, yield: 16.4, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-01'});
-      assets.push({symbol: 'MXRF11', qty: 1, price: 9.61, yield: 12.7, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-15'});
-      assets.push({symbol: 'TSLC', qty: 500, price: 1.00, yield: 12.00, category: 'Renda Fixa', irExempt: false, daysHeld: 100, purchaseDate: '2025-09-01'});
-      
-      recurrentIncomes.push({ type: 'Kwai/TikTok', value: 150.00, date: '2025-10-25' });
-      recurrentIncomes.push({ type: '99Pay', value: 300.00, date: '2025-11-05' });
-      recurrentIncomes.push({ type: 'Freelancer', value: 500.00, date: '2025-11-10' });
-
-      renderTable();
-      renderRecurrentTable();
-      resetForm();
-      alert('✅ Exemplos adicionados com sucesso!');
-    });
-
-    $('clearBtn').addEventListener('click', ()=>{
-      if(confirm('Limpar todos os ativos da carteira?')){
-        assets = [];
-        renderTable();
-        resetForm();
-      }
-    });
-
-    // STORAGE FUNCTIONS
-    function loadSaved(){
-      const rawAssets = localStorage.getItem('simulator_assets');
-      if(rawAssets) assets = JSON.parse(rawAssets);
-      
-      const rawRecurrent = localStorage.getItem('simulator_recurrent');
-      if(rawRecurrent) recurrentIncomes = JSON.parse(rawRecurrent);
-      
-      renderTable();
-      renderRecurrentTable();
-    }
-
-    $('saveBtn').addEventListener('click', ()=>{
-      localStorage.setItem('simulator_assets', JSON.stringify(assets));
-      localStorage.setItem('simulator_recurrent', JSON.stringify(recurrentIncomes));
-      alert('✅ Dados salvos com sucesso!');
-    });
-
-    $('resetStorage').addEventListener('click', ()=>{
-      if(confirm('⚠️ Apagar TODOS os dados salvos? Esta ação não pode ser desfeita!')){
-        localStorage.removeItem('simulator_assets');
-        localStorage.removeItem('simulator_recurrent');
-        assets = [];
-        recurrentIncomes = [];
-        renderTable();
-        renderRecurrentTable();
-        alert('✅ Dados apagados!');
-      }
-    });
-
-    // EXPORT
-    $('exportBtn').addEventListener('click', ()=>{
-      if(assets.length===0 && recurrentIncomes.length===0) return alert('Nenhum dado para exportar');
-
-      let csv = 'Simulador Financeiro - Export\n\n';
-      
-      csv += 'Carteira de Ativos\n';
-      const assetRows = [['symbol','category','qty','price','yield','irExempt','daysHeld','purchaseDate']];
-      assets.forEach(a=>assetRows.push([a.symbol,a.category,a.qty,a.price,a.yield,a.irExempt,a.daysHeld || 0, a.purchaseDate || 'N/A']));
-      csv += assetRows.map(r=>r.join(',')).join('\n') + '\n\n';
-
-      csv += 'Rendas Recorrentes\n';
-      const recurrentRows = [['type','value','date']];
-      recurrentIncomes.forEach(r=>recurrentRows.push([r.type, r.value, r.date]));
-      csv += recurrentRows.map(r=>r.join(',')).join('\n');
-
-      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'carteira_' + new Date().toISOString().split('T')[0] + '.csv';
-      link.click();
-      URL.revokeObjectURL(url);
-    });
-
-    // IMPORT
-    $('importBtn').addEventListener('click', ()=> $('importFile').click());
-    $('importFile').addEventListener('change', (e)=>{
-      const file = e.target.files[0];
-      if(!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = (ev)=>{
-        const text = ev.target.result;
-        const lines = text.split('\n');
-        
-        let inAssets = false;
-        let inRecurrent = false;
-        assets = [];
-        recurrentIncomes = [];
-
-        lines.forEach(line=>{
-          line = line.trim();
-          if (!line) return;
-
-          if (line === 'Carteira de Ativos') {
-            inAssets = true;
-            inRecurrent = false;
-            return;
-          } else if (line === 'Rendas Recorrentes') {
-            inAssets = false;
-            inRecurrent = true;
-            return;
-          } else if (line.startsWith('symbol') || line.startsWith('type')) {
-            return;
-          }
-
-          const values = line.split(',');
-
-          if (inAssets && values.length >= 8) {
-            const [symbol,category,qty,price,yieldVal,irExempt,daysHeld,purchaseDate] = values;
-            if(symbol && symbol.trim()) {
-              assets.push({
-                symbol: symbol.trim(),
-                qty: Number(qty),
-                price: Number(price),
-                yield: Number(yieldVal),
-                category: category,
-                irExempt: irExempt === 'true',
-                daysHeld: Number(daysHeld) || 0,
-                purchaseDate: purchaseDate || 'N/A'
-              });
+            if (category === 'Renda Fixa' && daysHeld > 0) {
+                if (daysHeld <= 180) rate = 0.225;
+                else if (daysHeld <= 360) rate = 0.20;
+                else if (daysHeld <= 720) rate = 0.175;
+                else rate = 0.15;
             }
-          <!doctype html>
-<html lang="pt-BR" data-theme="dark">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simulador Financeiro Pro — Rendas e Investimentos</title>
-  <style>
-    /* VARIÁVEIS DE TEMA - DARK MODE */
-    :root {
-      --bg: #0a0e1a;
-      --bg-secondary: #111827;
-      --card: #1a1f2e;
-      --card-hover: #20253a;
-      --accent: #06b6d4;
-      --accent-hover: #0891b2;
-      --accent-light: rgba(6, 182, 212, 0.1);
-      --success: #10b981;
-      --success-light: rgba(16, 185, 129, 0.1);
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --text: #f1f5f9;
-      --text-secondary: #cbd5e1;
-      --text-muted: #94a3b8;
-      --border: rgba(255, 255, 255, 0.1);
-      --border-light: rgba(255, 255, 255, 0.05);
-      --input-bg: #0f1419;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.4);
-      --gradient-primary: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-      --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      --gradient-bg: linear-gradient(180deg, #0a0e1a 0%, #111827 100%);
-    }
+
+            return income * rate;
+        }
+
+        function getAssetNetProvento(a) {
+            const invested = a.qty * a.price;
+            const provento = invested * (a.yield/100);
+            const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
+            return provento - ir;
+        }
+
+        function getTotalRecurrentBalance() {
+            return recurrentIncomes.reduce((sum, r) => sum + r.value, 0);
+        }
+
+        // RENDER RECURRENT TABLE
+        function renderRecurrentTable() {
+            recurrentTbody.innerHTML = '';
+            const sortedRendas = [...recurrentIncomes].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            sortedRendas.forEach((r) => {
+                const originalIndex = recurrentIncomes.indexOf(r);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${r.type}</strong></td>
+                    <td class="text-right">${currency(r.value)}</td>
+                    <td class="text-right">${formatDate(r.date)}</td>
+                    <td>
+                        <button class="btn btn-icon" onclick="deleteRecurrent(${originalIndex})">🗑️</button>
+                    </td>
+                `;
+                recurrentTbody.appendChild(tr);
+            });
+            
+            totalRecurrentIncomeEl.textContent = currency(getTotalRecurrentBalance());
+            drawCharts();
+            runSimulation(); // Recalculate simulation as recurrent income changes initial funds
+        }
+
+        // ADD RECURRENT INCOME
+        $('addRecurrentBtn').addEventListener('click', () => {
+            const type = $('recurrentIncomeType').value;
+            const value = Number($('recurrentValue').value);
+            const date = $('recurrentDate').value;
+
+            if (value <= 0) return alert('O valor deve ser maior que zero.');
+            if (!date) return alert('Selecione a data de recebimento.');
+            if (!type.trim()) return alert('Preencha o tipo de renda.');
+
+            recurrentIncomes.push({ type, value, date });
+            renderRecurrentTable();
+            
+            $('recurrentValue').value = '50.00';
+            $('recurrentDate').value = new Date().toISOString().split('T')[0];
+            $('recurrentIncomeType').value = 'Freelancer';
+        });
+
+        window.deleteRecurrent = function(index) {
+            if (confirm('Remover este pagamento de renda?')) {
+                recurrentIncomes.splice(index, 1);
+                renderRecurrentTable();
+            }
+        };
+
+        // ADD EXAMPLE ASSET
+        window.addExample = function(symbol, qty, price, category, yieldPerc, daysHeld = 0, isExempt = false) {
+            const finalPrice = (category === 'Renda Fixa' && symbol.includes('CDB')) ? 1.00 : Number(price);
+            const finalQty = (category === 'Renda Fixa' && symbol.includes('CDB')) ? Number(qty) * price : Number(qty);
+
+            const newAsset = {
+                symbol,
+                qty: finalQty,
+                price: finalPrice,
+                yield: Number(yieldPerc),
+                category,
+                irExempt: isExempt || category === 'FII' || category === 'Ações',
+                daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
+                purchaseDate: new Date().toISOString().split('T')[0]
+            };
+
+            assets.push(newAsset);
+            renderTable();
+            runSimulation();
+            alert(`✅ ${symbol} adicionado à carteira!`);
+        };
+
+        // RENDER CATEGORY STATS
+        function renderCategoryNetStats() {
+            const categories = {};
+            let totalNetAnnual = 0;
+            
+            assets.forEach(a => {
+                const category = a.category;
+                const invested = a.qty * a.price;
+                const netProvento = getAssetNetProvento(a);
+                
+                if (!categories[category]) {
+                    categories[category] = { invested: 0, netYield: 0, isExternal: false };
+                }
+                categories[category].invested += invested;
+                categories[category].netYield += netProvento;
+                totalNetAnnual += netProvento;
+            });
+
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            const relevantRendas = recurrentIncomes.filter(r => new Date(r.date) >= oneYearAgo);
+            
+            const externalYields = relevantRendas.reduce((acc, r) => {
+                acc[r.type] = (acc[r.type] || 0) + r.value;
+                return acc;
+            }, {});
+            
+            let externalHtml = '';
+            Object.entries(externalYields).forEach(([type, value]) => {
+                externalHtml += `
+                    <div class="category-card category-card-external">
+                        <div class="stat-label">💵 Renda ${type}</div>
+                        <div class="stat-value">${currency(value)}</div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Acumulado (12m)</div>
+                    </div>
+                `;
+            });
+
+            let assetHtml = '';
+            Object.entries(categories).forEach(([key, data]) => {
+                if (!data.isExternal) {
+                    assetHtml += `
+                        <div class="category-card">
+                            <div class="stat-label">${key}</div>
+                            <div class="stat-value">${currency(data.netYield)}</div>
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Investido: ${currency(data.invested)}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            const totalInvestedFromAssets = assets.reduce((s,a)=>s + a.qty*a.price, 0);
+            
+            // Render total asset stats at the end
+            assetHtml += `
+                <div class="category-card category-card-total">
+                    <div class="stat-label">💎 TOTAL (ATIVOS)</div>
+                    <div class="stat-value">${currency(totalNetAnnual)}</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:4px">Patrimônio: ${currency(totalInvestedFromAssets)}</div>
+                </div>
+            `;
+
+            categoryNetStatsEl.innerHTML = assetHtml + externalHtml;
+        }
+
+        // RENDER TABLE
+        function renderTable() {
+            tbody.innerHTML = '';
+            
+            const allInvest = assets.reduce((s,a)=>s+a.qty*a.price,0);
+            let allYield = 0, allIR = 0;
+            
+            assets.forEach(a => {
+                const invested = a.qty * a.price;
+                const provento = invested * (a.yield/100);
+                const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
+                
+                allYield += provento;
+                allIR += ir;
+            });
+
+            const filteredAssets = filterCategory ? assets.filter(a => a.category === filterCategory) : assets;
+            
+            filteredAssets.forEach((a) => {
+                const invested = a.qty * a.price;
+                const provento = invested * (a.yield/100);
+                const ir = calculateIR(provento, a.category, a.irExempt, a.daysHeld);
+                const netProvento = provento - ir;
+                const percentage = allInvest ? (invested / allInvest * 100) : 0;
+                
+                const isExemptByRule = a.category === 'FII' || a.category === 'Ações' || a.irExempt;
+                const badgeClass = isExemptByRule ? 'badge-success' : 'badge-danger';
+                const irText = isExemptByRule ? 'Isento' : currency(ir);
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${a.symbol}</strong></td>
+                    <td><span class="badge">${a.category}</span></td>
+                    <td class="text-right">${a.qty}</td>
+                    <td class="text-right">${currency(invested)}</td>
+                    <td class="text-right">${percentage.toFixed(1)}%</td>
+                    <td class="text-right">${a.yield.toFixed(2)}%</td>
+                    <td class="text-right">${currency(netProvento)}</td>
+                    <td class="text-right"><span class="badge ${badgeClass}">${irText}</span></td>
+                    <td>
+                        <button class="btn btn-icon" onclick="editAsset(${assets.indexOf(a)})">✏️</button>
+                        <button class="btn btn-icon" onclick="deleteAsset(${assets.indexOf(a)})">🗑️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            const netYield = allYield - allIR;
+            
+            totalInvestEl.textContent = currency(allInvest);
+            totalYieldEl.textContent = currency(allYield);
+            totalIREl.textContent = currency(allIR);
+            netYieldEl.textContent = currency(netYield);
+            
+            drawCharts();
+            renderCategoryNetStats();
+            runSimulation(); // Recalculate simulation as asset allocation changes
+        }
+
+        // PROCESS ASSET
+        function processAsset() {
+            const symbol = $('symbol').value.trim().toUpperCase();
+            const qty = $('qty').value;
+            const price = $('price').value;
+            const yieldPerc = $('yield').value;
+            const category = $('category').value;
+            const irExempt = $('irExempt').checked;
+            const daysHeld = $('daysHeld').value;
+            const purchaseDate = $('purchaseDate').value;
+
+            if(!symbol) return alert('Preencha o símbolo');
+            if(Number(qty) <= 0 || Number(price) <= 0) return alert('Quantidade e Preço devem ser maiores que zero.');
+
+            const newAsset = {
+                symbol,
+                qty:Number(qty),
+                price:Number(price),
+                yield:Number(yieldPerc),
+                category: category || 'Outros',
+                irExempt: Boolean(irExempt),
+                daysHeld: category === 'Renda Fixa' ? Number(daysHeld) : 0,
+                purchaseDate: purchaseDate
+            };
+            
+            if(editingIndex !== -1) {
+                assets[editingIndex] = newAsset;
+            } else {
+                assets.push(newAsset);
+            }
+
+            renderTable();
+            resetForm();
+        }
+
+        // RESET FORM
+        window.resetForm = function() {
+            $('symbol').value='';
+            $('qty').value=1;
+            $('price').value=10.00;
+            $('yield').value=10.00;
+            $('category').value='FII';
+            $('irExempt').checked=false;
+            $('daysHeld').value=721;
+            $('purchaseDate').value = new Date().toISOString().split('T')[0];
+            
+            editingIndex = -1;
+            $('addBtn').style.display = 'inline-flex';
+            $('updateBtn').style.display = 'none';
+            $('formTitle').textContent = 'Adicionar Ativo';
+            
+            $('category').dispatchEvent(new Event('change'));
+        }
+
+        // EDIT ASSET
+        window.editAsset = function(index) {
+            const a = assets[index];
+            
+            $('symbol').value = a.symbol;
+            $('qty').value = a.qty;
+            $('price').value = a.price;
+            $('yield').value = a.yield;
+            $('category').value = a.category;
+            $('irExempt').checked = a.irExempt;
+            $('daysHeld').value = a.daysHeld || 721;
+            $('purchaseDate').value = a.purchaseDate || new Date().toISOString().split('T')[0];
+            
+            $('category').dispatchEvent(new Event('change'));
+
+            $('addBtn').style.display = 'none';
+            $('updateBtn').style.display = 'inline-flex';
+            $('formTitle').textContent = `Editando: ${a.symbol}`;
+            editingIndex = index;
+            window.scrollTo(0, 0); // Scroll to form
+        };
+
+        // DELETE ASSET
+        window.deleteAsset = function(index) {
+            if(confirm(`Remover ${assets[index].symbol}?`)){
+                assets.splice(index, 1);
+                renderTable();
+                resetForm();
+            }
+        };
+
+        // EVENT LISTENERS
+        $('addBtn').addEventListener('click', processAsset);
+        $('updateBtn').addEventListener('click', processAsset);
+        $('resetFormBtn').addEventListener('click', resetForm);
+        
+        $('presetBtn').addEventListener('click', ()=>{
+            resetForm();
+            assets = []; // Clear existing for preset
+            recurrentIncomes = []; // Clear existing for preset
+            
+            assets.push({symbol: 'RZAG11', qty: 2, price: 9.00, yield: 16.4, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-01'});
+            assets.push({symbol: 'MXRF11', qty: 1, price: 9.61, yield: 12.7, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-15'});
+            assets.push({symbol: 'TSLC', qty: 500, price: 1.00, yield: 12.00, category: 'Renda Fixa', irExempt: false, daysHeld: 100, purchaseDate: '2025-09-01'});
+            assets.push({symbol: 'AçãoABC', qty: 10, price: 50.00, yield: 8.00, category: 'Ações', irExempt: true, daysHeld: 0, purchaseDate: '2023-01-01'});
+            
+            recurrentIncomes.push({ type: 'Kwai/TikTok', value: 150.00, date: '2025-10-25' });
+            recurrentIncomes.push({ type: '99Pay', value: 300.00, date: '2025-11-05' });
+            recurrentIncomes.push({ type: 'Freelancer', value: 500.00, date: '2025-11-10' });
+
+            renderTable();
+            renderRecurrentTable();
+            resetForm();
+            alert('✅ Exemplos adicionados com sucesso! Clique em salvar para manter os dados.');
+        });
+
+        $('clearBtn').addEventListener('click', ()=>{
+            if(confirm('Limpar todos os ativos da carteira?')){
+                assets = [];
+                renderTable();
+                resetForm();
+            }
+        });
+
+        // STORAGE FUNCTIONS
+        function loadSaved(){
+            const rawAssets = localStorage.getItem('simulator_assets');
+            if(rawAssets) assets = JSON.parse(rawAssets);
+            
+            const rawRecurrent = localStorage.getItem('simulator_recurrent');
+            if(rawRecurrent) recurrentIncomes = JSON.parse(rawRecurrent);
+            
+            renderTable();
+            renderRecurrentTable();
+        }
+
+        $('saveBtn').addEventListener('click', ()=>{
+            localStorage.setItem('simulator_assets', JSON.stringify(assets));
+            localStorage.setItem('simulator_recurrent', JSON.stringify(recurrentIncomes));
+            alert('✅ Dados salvos com sucesso!');
+        });
+
+        $('resetStorage').addEventListener('click', ()=>{
+            if(confirm('⚠️ Apagar TODOS os dados salvos (Ativos e Rendas)? Esta ação não pode ser desfeita!')){
+                localStorage.removeItem('simulator_assets');
+                localStorage.removeItem('simulator_recurrent');
+                assets = [];
+                recurrentIncomes = [];
+                renderTable();
+                renderRecurrentTable();
+                alert('✅ Dados apagados!');
+            }
+        });
+
+        // EXPORT
+        $('exportBtn').addEventListener('click', ()=>{
+            if(assets.length===0 && recurrentIncomes.length===0) return alert('Nenhum dado para exportar');
+
+            let csv = 'Simulador Financeiro - Export\n\n';
+            
+            csv += 'Carteira de Ativos\n';
+            const assetRows = [['symbol','category','qty','price','yield','irExempt','daysHeld','purchaseDate']];
+            assets.forEach(a=>assetRows.push([a.symbol,a.category,a.qty,a.price,a.yield,a.irExempt,a.daysHeld || 0, a.purchaseDate || 'N/A']));
+            csv += assetRows.map(r=>r.join(',')).join('\n') + '\n\n';
+
+            csv += 'Rendas Recorrentes\n';
+            const recurrentRows = [['type','value','date']];
+            recurrentIncomes.forEach(r=>recurrentRows.push([r.type, r.value, r.date]));
+            csv += recurrentRows.map(r=>r.join(',')).join('\n');
+
+            const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'carteira_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // IMPORT
+        $('importBtn').addEventListener('click', ()=> $('importFile').click());
+        $('importFile').addEventListener('change', (e)=>{
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (ev)=>{
+                const text = ev.target.result;
+                const lines = text.split('\n');
+                
+                let inAssets = false;
+                let inRecurrent = false;
+                assets = [];
+                recurrentIncomes = [];
+
+                lines.forEach(line=>{
+                    line = line.trim();
+                    if (!line) return;
+
+                    if (line.startsWith('Carteira de Ativos')) {
+                        inAssets = true;
+                        inRecurrent = false;
+                        return;
+                    } else if (line.startsWith('Rendas Recorrentes')) {
+                        inAssets = false;
+                        inRecurrent = true;
+                        return;
+                    } else if (line.startsWith('symbol') || line.startsWith('type')) {
+                        return; // Skip headers
+                    }
+
+                    const values = line.split(',');
+
+                    if (inAssets && values.length >= 8) {
+                        const [symbol,category,qty,price,yieldVal,irExempt,daysHeld,purchaseDate] = values;
+                        if(symbol && symbol.trim()) {
+                            assets.push({
+                                symbol: symbol.trim(),
+                                qty: Number(qty),
+                                price: Number(price),
+                                yield: Number(yieldVal),
+                                category: category,
+                                irExempt: irExempt === 'true',
+                                daysHeld: Number(daysHeld) || 0,
+                                purchaseDate: purchaseDate || 'N/A'
+                            });
+                        }
+                    } else if (inRecurrent && values.length >= 3) {
+                        const [type, value, date] = values;
+                        if(type && type.trim()) {
+                            recurrentIncomes.push({
+                                type: type.trim(),
+                                value: Number(value),
+                                date: date
+                            });
+                        }
+                    }
+                });
+
+                renderTable();
+                renderRecurrentTable();
+                alert('✅ Importação concluída! Verifique a carteira.');
+            };
+            reader.readAsText(file);
+        });
+
+
+        // SIMULATION LOGIC (Simplified/Placeholder - requires full implementation)
+        function runSimulation() {
+            const years = Number($('years').value);
+            const months = years * 12;
+            const monthlyContribution = Number($('monthlyContribution').value) + (getTotalRecurrentBalance() / 12); // Include recurrent income as contribution
+            const reinvest = $('reinvest').checked;
+            const considerInflation = $('considerInflation').checked;
+            const inflationRate = 0.045 / 12; // 4.5% a.a.
+
+            let currentPatrimony = assets.reduce((s,a)=>s+a.qty*a.price, 0);
+            let totalAportes = currentPatrimony;
+            let totalYields = 0;
+            let totalIR = 0;
+            let monthlyProjectionData = [];
+            let patrimonyHistory = [currentPatrimony]; // Start with initial patrimony
+
+            // Calculate initial annual gross/net yield and IR
+            const initialAnnualYield = assets.reduce((s,a)=>{
+                const invested = a.qty * a.price;
+                return s + (invested * (a.yield/100));
+            }, 0);
+            const initialAnnualIR = assets.reduce((s,a)=>{
+                const invested = a.qty * a.price;
+                const provento = invested * (a.yield/100);
+                return s + calculateIR(provento, a.category, a.irExempt, a.daysHeld);
+            }, 0);
+            const initialAnnualNetYield = initialAnnualYield - initialAnnualIR;
+            
+            // Assuming average monthly rate for future projection
+            const averageMonthlyNetRate = (initialAnnualNetYield / currentPatrimony) / 12 || 0.005; // Default 0.5% if no assets
+
+            // Simplified Future Projection (Monte Carlo/Detailed asset simulation requires complex logic not provided)
+            for (let m = 1; m <= months; m++) {
+                let monthStartPatrimony = currentPatrimony;
+                
+                // Step 1: Add Monthly Aporte
+                monthStartPatrimony += monthlyContribution;
+                totalAportes += monthlyContribution;
+                
+                // Step 2: Calculate Yield based on Month Start Patrimony
+                let grossYieldMonth = monthStartPatrimony * averageMonthlyNetRate;
+                
+                // Simplified IR calculation: assumes average tax rate on yield
+                let irMonth = (initialAnnualIR / initialAnnualYield) * grossYieldMonth || 0;
+                
+                if (assets.every(a => a.irExempt || a.category === 'FII' || a.category === 'Ações')) {
+                    irMonth = 0; // If all current assets are exempt, assume future growth is also exempt
+                }
+
+                let netYieldMonth = grossYieldMonth - irMonth;
+
+                totalYields += grossYieldMonth;
+                totalIR += irMonth;
+
+                // Step 3: Reinvest Proventos
+                if (reinvest) {
+                    currentPatrimony = monthStartPatrimony + netYieldMonth;
+                } else {
+                    currentPatrimony = monthStartPatrimony; // Proventos are withdrawn
+                }
+
+                // Step 4: Apply Inflation Adjustment (If considered)
+                if (considerInflation) {
+                    // Calculate real value of the patrimony
+                    const inflationFactor = 1 / (1 + inflationRate);
+                    currentPatrimony *= inflationFactor;
+                    
+                    // Note: This is a simplistic deflator applied monthly, making the result 'Patrimônio Real'.
+                    // This means the Patrimônio will be displayed in today's R$ value.
+                }
+
+                patrimonyHistory.push(currentPatrimony);
+
+                // Build Monthly Table Data
+                monthlyProjectionData.push({
+                    month: m,
+                    patrimony: currentPatrimony,
+                    aporte: monthlyContribution,
+                    proventoBruto: grossYieldMonth,
+                    ir: irMonth,
+                    proventoLiquido: netYieldMonth
+                });
+            }
+
+            // --- UPDATE UI ---
+            const finalPatrimony = currentPatrimony;
+            const finalNetYield = finalPatrimony - (totalAportes - currentPatrimony); // simplified calculation
+            
+            // Assuming final passive income is based on a safe withdrawal rate (e.g., 4% a.a. / 12) or projected monthly net yield
+            const finalMonthlyPassiveIncome = finalPatrimony * (0.04 / 12); 
+
+            $('yearsDisplay').textContent = years;
+            projectedNetYieldEl.textContent = currency(finalPatrimony);
+            projectedGrossYieldEl.textContent = currency(totalYields - totalIR);
+            projectedIRPaidEl.textContent = currency(totalIR);
+            monthlyPassiveIncomeEl.textContent = currency(finalMonthlyPassiveIncome);
+
+            // Render Monthly Table
+            const monthlyBody = $('monthlyProjectionBody');
+            monthlyBody.innerHTML = '';
+            
+            monthlyProjectionData.forEach(data => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${data.month}</td>
+                    <td class="text-right">${currency(data.patrimony)}</td>
+                    <td class="text-right">${currency(data.aporte)}</td>
+                    <td class="text-right">${currency(data.proventoBruto)}</td>
+                    <td class="text-right">${currency(data.ir)}</td>
+                    <td class="text-right">${currency(data.proventoLiquido)}</td>
+                `;
+                monthlyBody.appendChild(tr);
+            });
+
+            $('monthlyStats').textContent = `Total Aportado: ${currency(totalAportes)}, Ganhos Acumulados: ${currency(totalYields - totalIR)}`;
+
+            drawCharts(patrimonyHistory);
+        }
+
+        // CHARTING (Requires Chart.js library loaded)
+        let growthChartInstance = null;
+        let pieChartInstance = null;
+        
+        function drawCharts(patrimonyHistory = [0]) {
+            // --- PIE CHART (Diversification) ---
+            const categoryData = {};
+            let totalInvested = 0;
+            assets.forEach(a => {
+                const invested = a.qty * a.price;
+                categoryData[a.category] = (categoryData[a.category] || 0) + invested;
+                totalInvested += invested;
+            });
+
+            const pieLabels = Object.keys(categoryData);
+            const pieValues = Object.values(categoryData);
+            
+            const categoryColors = {
+                'FII': '#10b981', 
+                'Ações': '#3b82f6', 
+                'Renda Fixa': '#f59e0b', 
+                'Outros': '#64748b'
+            };
+
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(pieCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: pieLabels,
+                    datasets: [{
+                        data: pieValues,
+                        backgroundColor: pieLabels.map(label => categoryColors[label] || '#94a3b8'),
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: 'var(--text-secondary)' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const percentage = (value / totalInvested * 100).toFixed(1) + '%';
+                                    return `${label}: ${currency(value)} (${percentage})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Update Breakdown text
+            let breakdownHtml = 'Distribuição: ';
+            pieLabels.forEach((label, index) => {
+                const percentage = (pieValues[index] / totalInvested * 100).toFixed(1);
+                breakdownHtml += `<strong style="color:${categoryColors[label] || '#94a3b8'}">${label} ${percentage}%</strong>${index < pieLabels.length - 1 ? ' | ' : ''}`;
+            });
+            $('categoryBreakdown').innerHTML = breakdownHtml;
+
+            // --- GROWTH CHART (Projections) ---
+            const years = Number($('years').value);
+            const months = years * 12;
+            const chartLabels = Array.from({ length: months + 1 }, (_, i) => i === 0 ? 'Início' : `Mês ${i}`);
+            
+            if (growthChartInstance) growthChartInstance.destroy();
+            growthChartInstance = new Chart(chartCanvas, {
+                type: 'line',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Patrimônio',
+                        data: patrimonyHistory,
+                        borderColor: 'var(--accent)',
+                        backgroundColor: 'var(--accent-light)',
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: v => currency(v).split(' ')[1], color: 'var(--text-muted)' },
+                            grid: { color: 'var(--border-light)' }
+                        },
+                        x: {
+                            ticks: { color: 'var(--text-muted)', maxRotation: 0, autoSkip: true, maxTicksLimit: 10 },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Patrimônio: ${currency(context.parsed.y)}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // UI TRIGGERS
+        $('years').addEventListener('change', runSimulation);
+        $('monthlyContribution').addEventListener('input', runSimulation);
+        $('reinvest').addEventListener('change', runSimulation);
+        $('considerInflation').addEventListener('change', runSimulation);
+        
+        window.switchTab = function(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            $(`${tabName}-tab`).classList.add('active');
+        };
+
+        // Initialization
+        loadSaved();
+        runSimulation(); // Run initial simulation on load
+
+        // Renda Fixa form logic
+        $('category').addEventListener('change', function() {
+            const daysHeldGroup = $('daysHeldGroup');
+            if (this.value === 'Renda Fixa') {
+                daysHeldGroup.style.display = 'flex';
+                $('irExempt').checked = false;
+            } else {
+                daysHeldGroup.style.display = 'none';
+                $('irExempt').checked = (this.value === 'FII' || this.value === 'Ações');
+            }
+        });
+        
+        $('category').dispatchEvent(new Event('change')); // Initial setup
+
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     
-    /* VARIÁVEIS DE TEMA - LIGHT MODE */
-    [data-theme="light"] {
-      --bg: #f8fafc;
-      --bg-secondary: #f1f5f9;
-      --card: #ffffff;
-      --card-hover: #f8fafc;
-      --accent: #0284c7;
-      --accent-hover: #0369a1;
-      --accent-light: rgba(2, 132, 199, 0.1);
-      --success: #059669;
-      --success-light: rgba(5, 150, 105, 0.1);
-      --warning: #d97706;
-      --danger: #dc2626;
-      --text: #0f172a;
-      --text-secondary: #334155;
-      --text-muted: #64748b;
-      --border: rgba(0, 0, 0, 0.1);
-      --border-light: rgba(0, 0, 0, 0.05);
-      --input-bg: #f8fafc;
-      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-      --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-      --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.12);
-      --gradient-primary: linear-gradient(135deg, #0284c7 0%, #3b82f6 100%);
-      --gradient-success: linear-gradient(135deg, #059669 0%, #047857 100%);
-      --gradient-bg: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--gradient-bg);
-      color: var(--text);
-      line-height: 1.6;
-      transition: background 0.3s, color 0.3s;
-      min-height: 100vh;
-    }
-
-    .app-container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-
-    /* HEADER */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 24px;
-      margin-bottom: 24px;
-      background: var(--card);
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .header-content h1 {
-      font-size: 28px;
-      font-weight: 800;
-      background: var(--gradient-primary);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-subtitle {
-      font-size: 14px;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .theme-toggle {
-      padding: 10px 20px;
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      color: var(--text);
-      font-size: 14px;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .theme-toggle:hover {
-      background: var(--card-hover);
-      transform: translateY(-1px);
-    }
-
-    /* GRID LAYOUT */
-    .main-grid {
-      display: grid;
-      grid-template-columns: 1fr 480px;
-      gap: 24px;
-    }
-
-    /* CARDS */
-    .card {
-      background: var(--card);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--border);
-      transition: all 0.3s;
-    }
-
-    .card:hover {
-      box-shadow: var(--shadow-lg);
-      border-color: var(--border);
-    }
-
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-bottom: 16px;
-      border-bottom: 2px solid var(--border-light);
-    }
-
-    .card-header h2 {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--text);
-      flex: 1;
-    }
-
-    .card-icon {
-      font-size: 24px;
-    }
-
-    /* FORM CONTROLS */
-    .form-grid {
-      display: grid;
-      gap: 16px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 12px 16px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--input-bg);
-      color: var(--text);
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s;
-      font-family: inherit;
-    }
-
-    input:focus, select:focus {
-      outline: none;
-      border-color: var(--accent);
-      background: var(--card);
-      box-shadow: 0 0 0 3px var(--accent-light);
-    }
-
-    input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      accent-color: var(--accent);
-    }
-
-    /* BUTTONS */
-    .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 14px;
-      transition: all 0.2s;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      justify-content: center;
-      font-family: inherit;
-    }
-
-    .btn:active {
-      transform: scale(0.98);
-    }
-
-    .btn-primary {
-      background: var(--gradient-primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(6, 182, 212, 0.3);
-    }
-
-    .btn-success {
-      background: var(--gradient-success);
-      color: white;
-    }
-
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
-    }
-
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-warning {
-      background: var(--warning);
-      color: white;
-    }
-
-    .btn-secondary {
-      background: #8b5cf6;
-      color: white;
-    }
-
-    .btn-icon {
-      padding: 8px 12px;
-      font-size: 16px;
-      background: var(--input-bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-icon:hover {
-      background: var(--card-hover);
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    /* STATS CARDS */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-
-    .stat-card {
-      background: var(--input-bg);
-      padding: 20px;
-      border-radius: 12px;
-      border-left: 4px solid var(--accent);
-      transition: all 0.2s;
-    }
-
-    .stat-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--shadow);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--text);
-    }
-
-    .stat-card-highlight {
-      background: var(--gradient-success);
-      color: white;
-      border-left-color: white;
-    }
-
-    .stat-card-highlight .stat-label,
-    .stat-card-highlight .stat-value {
-      color: white;
-    }
-
-    /* TABLE */
-    .table-container {
-      overflow-x: auto;
-      margin-top: 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
-    }
-
-    thead {
-      background: var(--input-bg);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    th {
-      padding: 14px 12px;
-      text-align: left;
-      font-weight: 700;
-      color: var(--accent);
-      text-transform: uppercase;
-      font-size: 11px;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid var(--border);
-    }
-
-    td {
-      padding: 14px 12px;
-      border-bottom: 1px solid var(--border-light);
-      color: var(--text-secondary);
-    }
-
-    tbody tr {
-      transition: background 0.2s;
-    }
-
-    tbody tr:hover {
-      background: var(--card-hover);
-    }
-
-    .text-right {
-      text-align: right;
-    }
-
-    /* BADGES */
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      background: var(--accent-light);
-      color: var(--accent);
-    }
-
-    .badge-success {
-      background: var(--success-light);
-      color: var(--success);
-    }
-
-    .badge-danger {
-      background: rgba(239, 68, 68, 0.1);
-      color: var(--danger);
-    }
-
-    /* TABS */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--border);
-    }
-
-    .tab {
-      padding: 12px 20px;
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      margin-bottom: -2px;
-      font-weight: 700;
-      color: var(--text-muted);
-      transition: all 0.2s;
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .tab:hover {
-      color: var(--text);
-      background: var(--card-hover);
-    }
-
-    .tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* SUGGESTIONS */
-    .suggestion-card {
-      background: var(--input-bg);
-      padding: 16px;
-      border-radius: 10px;
-      margin-bottom: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      border: 1px solid var(--border-light);
-      transition: all 0.2s;
-    }
-
-    .suggestion-card:hover {
-      border-color: var(--accent);
-      background: var(--card-hover);
-    }
-
-    .suggestion-content {
-      flex: 1;
-    }
-
-    .suggestion-title {
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-
-    .suggestion-desc {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    /* BALANCE CARD */
-    .balance-card {
-      background: var(--gradient-success);
-      color: white;
-      padding: 24px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 10px 24px rgba(16, 185, 129, 0.4);
-      margin-top: 20px;
-    }
-
-    .balance-label {
-      font-size: 13px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      opacity: 0.9;
-      margin-bottom: 8px;
-    }
-
-    .balance-value {
-      font-size: 36px;
-      font-weight: 900;
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    /* CHART CONTAINER */
-    .chart-container {
-      background: var(--input-bg);
-      padding: 20px;
-      border-radius: 12px;
-      margin-top: 20px;
-      border: 1px solid var(--border-light);
-    }
-
-    /* CATEGORY STATS */
-    .category-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
-      padding: 16px;
-      background: var(--input-bg);
-      border-radius: 12px;
-      border: 1px solid var(--border-light);
-      margin-top: 16px;
-    }
-
-    .category-card {
-      padding: 16px;
-      border-radius: 10px;
-      background: var(--card);
-      border-left: 4px solid var(--accent);
-      transition: all 0.2s;
-    }
-
-    .category-card:hover {
-      transform: scale(1.02);
-      box-shadow: var(--shadow);
-    }
-
-    .category-card-external {
-      border-left-color: #8b5cf6;
-    }
-
-    .category-card-total {
-      background: var(--accent-light);
-      border-left-color: var(--success);
-    }
-
-    /* CHECKBOX GROUP */
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px;
-      background: var(--input-bg);
-      border-radius: 10px;
-      border: 1px solid var(--border-light);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .checkbox-group:hover {
-      background: var(--card-hover);
-      border-color: var(--accent);
-    }
-
-    .checkbox-group label {
-      cursor: pointer;
-      margin: 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: none;
-      letter-spacing: normal;
-    }
-
-    /* FOOTER */
-    .footer {
-      text-align: center;
-      padding: 24px;
-      margin-top: 40px;
-      border-top: 1px solid var(--border);
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 1200px) {
-      .main-grid {
-        grid-template-columns: 1fr 420px;
-      }
-    }
-
-    @media (max-width: 968px) {
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .category-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 640px) {
-      .app-container {
-        padding: 12px;
-      }
-
-      .header {
-        padding: 16px;
-      }
-
-      .header-content h1 {
-        font-size: 22px;
-      }
-
-      .card {
-        padding: 16px;
-        margin-bottom: 16px;
-      }
-
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .category-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .btn {
-        width: 100%;
-      }
-
-      .stat-value {
-        font-size: 20px;
-      }
-
-      .balance-value {
-        font-size: 28px;
-      }
-
-      .tabs {
-        overflow-x: auto;
-      }
-
-      .tab {
-        white-space: nowrap;
-      }
-    }
-
-    /* SCROLLBAR */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: var(--input-bg);
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-muted);
-    }
-
-    /* ANIMATIONS */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .card {
-      animation: slideIn 0.4s ease-out;
-    }
-
-    /* LOADING STATE */
-    .loading {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
-</head>
-<body>
-  <div class="app-container">
-    <!-- HEADER -->
-    <header class="header">
-      <div class="header-content">
-        <h1>
-          <span class="card-icon">🚀</span>
-          Simulador Financeiro Pro
-        </h1>
-        <p class="header-subtitle">Gestão Completa de Rendas e Investimentos</p>
-      </div>
-      <button class="theme-toggle" id="themeToggle">
-        <span id="themeIcon">🌙</span>
-        <span id="themeText">Modo Escuro</span>
-      </button>
-    </header>
-
-    <div class="main-grid">
-      <!-- LEFT COLUMN -->
-      <div>
-        <!-- ASSET FORM -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">➕</span>
-            <h2 id="formTitle">Adicionar Ativo</h2>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Símbolo</label>
-                <input id="symbol" placeholder="Ex: RZAG11" />
-              </div>
-              <div class="form-group">
-                <label>Quantidade</label>
-                <input id="qty" type="number" min="1" step="1" value="1" />
-              </div>
-              <div class="form-group">
-                <label>Preço (R$)</label>
-                <input id="price" type="number" min="0.01" step="0.01" value="10.00" />
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label>Yield Anual (%)</label>
-                <input id="yield" type="number" min="0" step="0.01" value="10.00" />
-              </div>
-              <div class="form-group">
-                <label>Categoria</label>
-                <select id="category">
-                  <option value="FII">FII (Provento Isento)</option>
-                  <option value="Ações">Ações (Provento Isento)</option>
-                  <option value="Renda Fixa">Renda Fixa (IR Regressivo)</option>
-                  <option value="ETF">ETF</option>
-                  <option value="Criptomoedas">Criptomoedas</option>
-                  <option value="Outros">Outros</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Data de Aquisição</label>
-                <input id="purchaseDate" type="date" />
-              </div>
-            </div>
-
-            <div id="rfDurationRow" style="display:none">
-              <div class="form-group">
-                <label>Duração (dias) - Renda Fixa</label>
-                <input id="daysHeld" type="number" min="1" value="721" placeholder="Ex: 721 dias para 15%" />
-              </div>
-            </div>
-
-            <div class="checkbox-group">
-              <input type="checkbox" id="irExempt" />
-              <label for="irExempt">Marcar como Isento de IR</label>
-            </div>
-
-            <div class="btn-group">
-              <button class="btn btn-primary" id="addBtn">
-                ➕ ADICIONAR
-              </button>
-              <button class="btn btn-success" id="updateBtn" style="display:none">
-                ✓ ATUALIZAR
-              </button>
-              <button class="btn btn-secondary" id="presetBtn">
-                🎯 EXEMPLOS
-              </button>
-              <button class="btn btn-danger" id="clearBtn">
-                🗑️ LIMPAR
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <!-- RECURRENT INCOME -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">💵</span>
-            <h2>Rendas Recorrentes</h2>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-row">
-              <div class="form-group">
-                <label>Tipo de Renda</label>
-                <select id="recurrentIncomeType">
-                  <option value="Kwai/TikTok">Monetização Kwai/TikTok</option>
-                  <option value="99Pay">Rendimento 99Pay/Mercado Pago</option>
-                  <option value="Afiliados">Afiliados/Comissões</option>
-                  <option value="Freelancer">Serviço Freelancer</option>
-                  <option value="Outra">Outra Renda</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Valor (R$)</label>
-                <input type="number" id="recurrentValue" min="0.01" step="0.01" value="50.00" />
-              </div>
-              <div class="form-group">
-                <label>Data</label>
-                <input type="date" id="recurrentDate" />
-              </div>
-            </div>
-
-            <button class="btn btn-primary" id="addRecurrentBtn">
-              ➕ REGISTRAR RENDA
-            </button>
-
-            <div class="balance-card">
-              <div class="balance-label">💰 Saldo Total Acumulado</div>
-              <div class="balance-value" id="totalRecurrentIncome">R$ 0,00</div>
-            </div>
-
-            <div class="table-container">
-              <table id="recurrentIncomeTable">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th class="text-right">Valor</th>
-                    <th class="text-right">Data</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <!-- PORTFOLIO -->
-        <section class="card">
-          <div class="card-header">
-            <span class="card-icon">💼</span>
-            <h2>Carteira de Investimentos</h2>
-          </div>
-
-          <div class="form-group" style="margin-bottom:16px">
-            <label>Filtrar por Categoria</label>
-            <select id="filterCategory">
-              <option value="">Todas as categorias</option>
-              <option value="FII">FII</option>
-              <option value="Ações">Ações</option>
-              <option value="Renda Fixa">Renda Fixa</option>
-              <option value="ETF">ETF</option>
-              <option value="Criptomoedas">Criptomoedas</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-
-          <div class="table-container">
-            <table id="assetsTable">
-              <thead>
-                <tr>
-                  <th>Ativo</th>
-                  <th>Categoria</th>
-                  <th class="text-right">Qtd</th>
-                  <th class="text-right">Investido</th>
-                  <th class="text-right">% Port.</th>
-                  <th class="text-right">Yield</th>
-                  <th class="text-right">Prov. Líq./ano</th>
-                  <th class="text-right">IR</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">Total Investido</div>
-              <div class="stat-value" id="totalInvest">R$ 0,00</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Proventos Brutos/Ano</div>
-              <div class="stat-value" id="totalYield">R$ 0,00</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">IR Anual Estimado</div>
-              <div class="stat-value" id="totalIR">R$ 0,00</div>
-            </div>
-            <div class="stat-card stat-card-highlight">
-              <div class="stat-label">Provento Líquido Anual</div>
-              <div class="stat-value" id="netYield">R$ 0,00</div>
-            </div>
-          </div>
-
-          <div class="card-header" style="margin-top:32px; border-bottom:none; padding-bottom:0">
-            <span class="card-icon">📊</span>
-            <h2>Dashboard de Ganhos</h2>
-          </div>
-          <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px">
-            Rendimento líquido por categoria de ativos e rendas recorrentes acumuladas
-          </p>
-
-          <div id="categoryNetStats" class="category-grid"></div>
-
-          <div class="btn-group" style="margin-top:24px">
-            <button class="btn btn-success" id="saveBtn">💾 SALVAR</button>
-            <button class="btn btn-secondary" id="exportBtn">📤 EXPORTAR</button>
-            <button class="btn btn-primary" id="importBtn">📥 IMPORTAR</button>
-            <button class="btn btn-warning" id="resetStorage">⚠️ APAGAR DADOS</button>
-          </div>
-          
+</body>
+</html>
