@@ -803,9 +803,52 @@
     </div>
     <script>
         // 🔑 CONFIGURAÇÃO DA INTEGRAÇÃO COM GOOGLE SHEETS
-        const API_KEY = "minha_chave_secreta_123"; // Pode ser qualquer valor, mas mantenha igual no Apps Script
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxS010Gob9KtnKiJiu-0zi3A-OG30P8gfm3t2q3kmAzk6PNtSodN0t4F_00pWRCIG_z/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby8f32hRAu1qR3BLNJ9amoavQFlAGZoKuP5fy4ivgg0KvFlmtGWBbVIkSgnpQikvhMZ/exec";
 
+// ✅ SALVAR NO SHEETS
+$('saveSheetsBtn').addEventListener('click', async () => {
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        assets: assets,
+        rendas: recurrentIncomes
+      })
+    });
+    const result = await response.json();
+    if (result.success) {
+      alert('✅ Dados salvos no Google Sheets!');
+    } else {
+      alert('❌ Erro ao salvar: ' + (result.error || 'Desconhecido'));
+      console.error('Erro do Sheets:', result);
+    }
+  } catch (err) {
+    alert('⚠️ Falha na conexão com o Google Sheets:\n' + err.message);
+    console.error('Erro de rede:', err);
+  }
+});
+
+// ✅ CARREGAR DO SHEETS
+$('loadSheetsBtn').addEventListener('click', async () => {
+  try {
+    const response = await fetch(APPS_SCRIPT_URL);
+    const data = await response.json();
+    if (data.error) {
+      alert('❌ Erro ao carregar: ' + data.error);
+      console.error('Erro do Sheets:', data);
+      return;
+    }
+    assets = data.assets || [];
+    recurrentIncomes = data.rendas || [];
+    renderTable();
+    renderRecurrentTable();
+    alert('✅ Dados carregados do Google Sheets!');
+  } catch (err) {
+    alert('⚠️ Falha ao carregar do Google Sheets:\n' + err.message);
+    console.error('Erro de rede:', err);
+  }
+});
         // UTILITIES
         const $ = id => document.getElementById(id);
         const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
