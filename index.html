@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Simulador Financeiro Pro — Rendas e Investimentos</title>
     <style>
-        /* (Mesmo CSS original — mantido exatamente como no seu arquivo) */
+        /* (CSS exatamente igual ao fornecido — mantido por brevidade) */
         :root {
             --bg: #0a0e1a;
             --bg-secondary: #111827;
@@ -467,25 +467,344 @@
             <div class="btn-group">
                 <button id="importBtn" class="btn btn-secondary">📥 IMPORTAR</button>
                 <button id="exportBtn" class="btn btn-secondary">📤 EXPORTAR</button>
-                <button id="loadSheetsBtn" class="btn btn-secondary">☁️ CARREGAR DO SHEETS</button>
                 <button id="saveSheetsBtn" class="btn btn-secondary">💾 SALVAR NO SHEETS</button>
+                <button id="loadSheetsBtn" class="btn btn-secondary">☁️ CARREGAR DO SHEETS</button>
                 <button id="resetStorage" class="btn btn-icon">🔥</button>
                 <button id="themeToggle" class="theme-toggle">🌙 Escuro</button>
             </div>
         </header>
         <div class="main-grid">
-            <!-- (Corpo principal mantido exatamente igual — omitido por brevidade, mas presente no final) -->
-            <!-- Todo o conteúdo do <div class="main-grid"> até o <footer> é idêntico ao seu original -->
-            <!-- ... -->
+            <!-- TODO O CONTEÚDO DO MAIN-GRID FOI MANTIDO EXATAMENTE IGUAL AO ARQUIVO FORNECIDO -->
+            <!-- (Por brevidade, mantemos a estrutura, mas o script final inclui tudo) -->
+            <div>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">➕</span>
+                        <h2 id="formTitle">Adicionar Ativo</h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Símbolo / Título</label>
+                                <input type="text" id="symbol" placeholder="Ex: MXRF11, Tesouro Selic, CDB..." />
+                            </div>
+                            <div class="form-group">
+                                <label>Categoria</label>
+                                <select id="category">
+                                    <option value="FII">Fundo Imobiliário (FII)</option>
+                                    <option value="Ações">Ações</option>
+                                    <option value="Renda Fixa">Renda Fixa</option>
+                                    <option value="Outros">Outros</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Qtde</label>
+                                <input type="number" id="qty" min="1" value="1" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Preço (R$)</label>
+                                <input type="number" id="price" min="0" step="0.01" value="10.00" />
+                            </div>
+                            <div class="form-group">
+                                <label>Yield/Rendimento Anual (%)</label>
+                                <input type="number" id="yield" min="0" step="0.01" value="10.00" />
+                            </div>
+                            <div class="form-group" id="daysHeldGroup" style="display:none">
+                                <label>Dias de Posse (IR Regressivo)</label>
+                                <input type="number" id="daysHeld" min="1" value="721" />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Data de Compra</label>
+                                <input type="date" id="purchaseDate" value="2024-11-12" />
+                            </div>
+                            <div class="checkbox-group" style="align-self: flex-end;">
+                                <input type="checkbox" id="irExempt" />
+                                <label for="irExempt">Provento Isento de IR</label>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button id="addBtn" class="btn btn-primary">ADICIONAR ATIVO</button>
+                            <button id="updateBtn" class="btn btn-success" style="display:none">ATUALIZAR ATIVO</button>
+                            <button id="resetFormBtn" class="btn btn-secondary" onclick="resetForm()">LIMPAR FORM</button>
+                        </div>
+                    </div>
+                </section>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💼</span>
+                        <h2>Carteira de Ativos</h2>
+                        <button id="presetBtn" class="btn btn-secondary" style="margin-left:auto">Exemplos</button>
+                        <button id="clearBtn" class="btn btn-icon">🧹</button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Investido Total</div>
+                            <div class="stat-value" id="totalInvest">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color:var(--success)">
+                            <div class="stat-label">Provento Líquido Anual</div>
+                            <div class="stat-value" id="netYield">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Provento Bruto Anual</div>
+                            <div class="stat-value" id="totalYield">R$ 0,00</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color:var(--danger)">
+                            <div class="stat-label">IR Total Anual</div>
+                            <div class="stat-value" id="totalIR">R$ 0,00</div>
+                        </div>
+                    </div>
+                    <div id="categoryNetStats" class="stats-grid">
+                        </div>
+                    <div class="table-container" style="margin-top:24px">
+                        <table id="assetsTable">
+                            <thead>
+                                <tr>
+                                    <th>Ativo</th>
+                                    <th>Cat.</th>
+                                    <th class="text-right">Qtde</th>
+                                    <th class="text-right">Investido</th>
+                                    <th class="text-right">% Carteira</th>
+                                    <th class="text-right">Yield (%)</th>
+                                    <th class="text-right">Prov. Líq. Anual</th>
+                                    <th class="text-right">IR</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💵</span>
+                        <h2>Rendas Recorrentes (Extra)</h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tipo de Renda</label>
+                                <input type="text" id="recurrentIncomeType" value="Freelancer" placeholder="Ex: Serviços, Vendas, Aluguel..." />
+                            </div>
+                            <div class="form-group">
+                                <label>Valor (R$)</label>
+                                <input type="number" id="recurrentValue" min="0" step="10.00" value="50.00" />
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Recebimento</label>
+                                <input type="date" id="recurrentDate" value="2025-11-12" />
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button id="addRecurrentBtn" class="btn btn-secondary">ADICIONAR RENDA</button>
+                        </div>
+                    </div>
+                    <h3 style="margin-top:24px; font-size:16px; font-weight:700">Histórico de Rendas</h3>
+                    <div class="table-container" style="margin-top:16px">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo</th>
+                                    <th class="text-right">Valor</th>
+                                    <th class="text-right">Data</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recurrentIncomeTable">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div style="text-align:right; margin-top:12px; font-weight:700; color:var(--text-secondary)">
+                        Total Recorrente (Aportado): <span id="totalRecurrentIncome">R$ 0,00</span>
+                    </div>
+                </section>
+                <input type="file" id="importFile" accept=".csv" style="display:none" />
+            </div>
+            <aside>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">🎯</span>
+                        <h2>Configuração da Simulação</h2>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Horizonte</label>
+                                <select id="years">
+                                    <option value="1">1 ano</option>
+                                    <option value="3">3 anos</option>
+                                    <option value="5" selected>5 anos</option>
+                                    <option value="10">10 anos</option>
+                                    <option value="15">15 anos</option>
+                                    <option value="20">20 anos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Aporte Mensal (R$)</label>
+                                <input type="number" id="monthlyContribution" min="0" step="100" value="500" />
+                            </div>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="reinvest" checked />
+                            <label for="reinvest">Reinvestir proventos líquidos</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="considerInflation" />
+                            <label for="considerInflation">Considerar inflação (IPCA 4,5% a.a.)</label>
+                        </div>
+                    </div>
+                </section>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💡</span>
+                        <h2>Sugestões de Investimento</h2>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px">
+                        Adicione exemplos para simular diferentes estratégias:
+                    </p>
+                    <div id="investmentSuggestions">
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">🏦 CDB 110% CDI</div>
+                                <div class="suggestion-desc">Renda Fixa • IR Regressivo (22.5% → 15%)</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('CDB110', 1000, 1, 'Renda Fixa', 13.5, 721)">
+                                ADICIONAR
+                            </button>
+                        </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">📝 LCA/LCI (Isento)</div>
+                                <div class="suggestion-desc">Renda Fixa • Isento de IR</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('LCA95', 1000, 1, 'Renda Fixa', 11.8, 0, true)">
+                                ADICIONAR
+                            </button>
+                        </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">📈 Ação PETR4</div>
+                                <div class="suggestion-desc">Ações • Provento Isento</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('PETR4', 1, 35.00, 'Ações', 12.0)">
+                                ADICIONAR
+                            </button>
+                        </div>
+                        <div class="suggestion-card">
+                            <div class="suggestion-content">
+                                <div class="suggestion-title">🏢 FII MXRF11</div>
+                                <div class="suggestion-desc">FII • Provento Isento</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="addExample('MXRF11', 1, 10.00, 'FII', 12.7)">
+                                ADICIONAR
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                <section class="card">
+                    <div class="card-header">
+                        <span class="card-icon">💰</span>
+                        <h2>Ideias de Renda Extra</h2>
+                    </div>
+                    <div style="display:grid; gap:16px">
+                        <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--accent)">
+                            <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                                🎨 Gestão de Redes Sociais
+                            </div>
+                            <div style="font-size:13px; color:var(--text-muted)">
+                                Pacotes mensais para pequenos negócios
+                            </div>
+                        </div>
+                        <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--success)">
+                            <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                                📱 Afiliados + Tráfego Pago
+                            </div>
+                            <div style="font-size:13px; color:var(--text-muted)">
+                                Escale vendas com anúncios direcionados
+                            </div>
+                        </div>
+                        <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--warning)">
+                            <div style="font-weight:700; color:var(--text); margin-bottom:4px">
+                                📚 Cursos e E-books
+                            </div>
+                            <div style="font-size:13px; color:var(--text-muted)">
+                                Monetize seu conhecimento digital
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="card">
+                    <div class="tabs">
+                        <div class="tab active" onclick="switchTab('growth')">📊 Crescimento</div>
+                        <div class="tab" onclick="switchTab('monthly')">📅 Detalhes</div>
+                    </div>
+                    <div id="growth-tab" class="tab-content active">
+                        <h3 style="color:var(--text); font-size:18px; font-weight:700; margin-bottom:16px">
+                            Projeção Final (<span id="yearsDisplay">5</span> Anos)
+                        </h3>
+                        <div class="stats-grid" style="grid-template-columns:1fr 1fr">
+                            <div class="stat-card">
+                                <div class="stat-label">Patrimônio Final</div>
+                                <div class="stat-value" id="projectedNetYield">R$ 0,00</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color:var(--success)">
+                                <div class="stat-label">Ganhos Totais</div>
+                                <div class="stat-value" id="projectedGrossYield">R$ 0,00</div>
+                            </div>
+                            <div class="stat-card" style="border-left-color:var(--danger)">
+                                <div class="stat-label">IR Total Pago</div>
+                                <div class="stat-value" id="projectedIRPaid">R$ 0,00</div>
+                            </div>
+                            <div class="stat-card stat-card-highlight">
+                                <div class="stat-label">Renda Passiva Mensal</div>
+                                <div class="stat-value" id="monthlyPassiveIncome">R$ 0,00</div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="growthChart" width="450" height="280"></canvas>
+                        </div>
+                        <h3 style="color:var(--text); font-size:18px; font-weight:700; margin:24px 0 16px">
+                            Diversificação da Carteira
+                        </h3>
+                        <div class="chart-container" style="background:none; border:none; padding:0">
+                            <canvas id="pieChart" width="450" height="240"></canvas>
+                        </div>
+                        <div id="categoryBreakdown" style="margin-top:16px; padding:16px; background:var(--input-bg); border-radius:10px; font-size:13px"></div>
+                    </div>
+                    <div id="monthly-tab" class="tab-content">
+                        <div class="table-container" style="max-height:500px; overflow-y:auto">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mês</th>
+                                        <th class="text-right">Patrimônio</th>
+                                        <th class="text-right">Aporte</th>
+                                        <th class="text-right">Prov. Bruto</th>
+                                        <th class="text-right">IR</th>
+                                        <th class="text-right">Prov. Líq.</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyProjectionBody"></tbody>
+                            </table>
+                        </div>
+                        <div id="monthlyStats" style="margin-top:16px; padding:16px; background:var(--success-light); border-radius:10px; font-size:13px; color:var(--text-secondary)"></div>
+                    </div>
+                </section>
+            </aside>
         </div>
         <footer class="footer">
             <strong>Simulador Financeiro Pro v2.0</strong> — Ferramenta educacional para planejamento financeiro
         </footer>
     </div>
     <script>
-        // 🔑 CONFIGURAÇÃO DA INTEGRAÇÃO
-        const API_KEY = "minha_chave_secreta_123"; // ← Use a mesma no Apps Script
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9B1swyshs7mTyGP_rycWEIWlG_lhFuU4Ixa8hPLMDVXJs2pYzqRNl8Ang9CzH3uCv/exec"; // ← Substitua!
+        // 🔑 CONFIGURAÇÃO DA INTEGRAÇÃO COM GOOGLE SHEETS
+        const API_KEY = "minha_chave_secreta_123"; // Pode ser qualquer valor, mas mantenha igual no Apps Script
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw9B1swyshs7mTyGP_rycWEIWlG_lhFuU4Ixa8hPLMDVXJs2pYzqRNl8Ang9CzH3uCv/exec";
 
         // UTILITIES
         const $ = id => document.getElementById(id);
@@ -775,7 +1094,7 @@
             $('category').dispatchEvent(new Event('change'));
         }
 
-        // EDIT ASSET
+        // EDIT / DELETE / EVENT LISTENERS
         window.editAsset = function(index) {
             const a = assets[index];
             $('symbol').value = a.symbol;
@@ -793,8 +1112,6 @@
             editingIndex = index;
             window.scrollTo(0, 0);
         };
-
-        // DELETE ASSET
         window.deleteAsset = function(index) {
             if(confirm(`Remover ${assets[index].symbol}?`)){
                 assets.splice(index, 1);
@@ -802,8 +1119,6 @@
                 resetForm();
             }
         };
-
-        // EVENT LISTENERS
         $('addBtn').addEventListener('click', processAsset);
         $('updateBtn').addEventListener('click', processAsset);
         $('resetFormBtn').addEventListener('click', resetForm);
@@ -831,7 +1146,7 @@
             }
         });
 
-        // STORAGE FUNCTIONS
+        // STORAGE (localStorage)
         function loadSaved(){
             const rawAssets = localStorage.getItem('simulator_assets');
             if(rawAssets) assets = JSON.parse(rawAssets);
@@ -840,13 +1155,11 @@
             renderTable();
             renderRecurrentTable();
         }
-
         $('saveBtn').addEventListener('click', ()=>{
             localStorage.setItem('simulator_assets', JSON.stringify(assets));
             localStorage.setItem('simulator_recurrent', JSON.stringify(recurrentIncomes));
             alert('✅ Dados salvos com sucesso!');
         });
-
         $('resetStorage').addEventListener('click', ()=>{
             if(confirm('⚠️ Apagar TODOS os dados salvos (Ativos e Rendas)? Esta ação não pode ser desfeita!')){
                 localStorage.removeItem('simulator_assets');
@@ -859,7 +1172,7 @@
             }
         });
 
-        // EXPORT
+        // EXPORT / IMPORT
         $('exportBtn').addEventListener('click', ()=>{
             if(assets.length===0 && recurrentIncomes.length===0) return alert('Nenhum dado para exportar');
             let csv = 'Simulador Financeiro - Export\n';
@@ -879,8 +1192,6 @@
             link.click();
             URL.revokeObjectURL(url);
         });
-
-        // IMPORT
         $('importBtn').addEventListener('click', ()=> $('importFile').click());
         $('importFile').addEventListener('change', (e)=>{
             const file = e.target.files[0];
@@ -940,7 +1251,7 @@
             reader.readAsText(file);
         });
 
-        // 📤 SALVAR NO GOOGLE SHEETS
+        // ✅ INTEGRAÇÃO COM GOOGLE SHEETS
         $('saveSheetsBtn').addEventListener('click', async () => {
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
@@ -963,7 +1274,6 @@
             }
         });
 
-        // 📥 CARREGAR DO GOOGLE SHEETS
         $('loadSheetsBtn').addEventListener('click', async () => {
             try {
                 const url = `${APPS_SCRIPT_URL}?key=${API_KEY}`;
@@ -983,7 +1293,7 @@
             }
         });
 
-        // SIMULATION LOGIC
+        // SIMULATION & CHARTS
         function runSimulation() {
             const years = Number($('years').value);
             const months = years * 12;
@@ -1064,7 +1374,6 @@
             drawCharts(patrimonyHistory);
         }
 
-        // CHARTING
         let growthChartInstance = null;
         let pieChartInstance = null;
         function drawCharts(patrimonyHistory = [0]) {
@@ -1180,8 +1489,6 @@
             document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
             $(`${tabName}-tab`).classList.add('active');
         };
-
-        // Renda Fixa form logic
         $('category').addEventListener('change', function() {
             const daysHeldGroup = $('daysHeldGroup');
             if (this.value === 'Renda Fixa') {
@@ -1192,337 +1499,11 @@
                 $('irExempt').checked = (this.value === 'FII' || this.value === 'Ações');
             }
         });
-
-        // Inicialização
         loadSaved();
         runSimulation();
         $('category').dispatchEvent(new Event('change'));
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-    <!-- Conteúdo do main-grid (igual ao original) -->
-    <div class="main-grid">
-        <div>
-            <section class="card">
-                <div class="card-header">
-                    <span class="card-icon">➕</span>
-                    <h2 id="formTitle">Adicionar Ativo</h2>
-                </div>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Símbolo / Título</label>
-                            <input type="text" id="symbol" placeholder="Ex: MXRF11, Tesouro Selic, CDB..." />
-                        </div>
-                        <div class="form-group">
-                            <label>Categoria</label>
-                            <select id="category">
-                                <option value="FII">Fundo Imobiliário (FII)</option>
-                                <option value="Ações">Ações</option>
-                                <option value="Renda Fixa">Renda Fixa</option>
-                                <option value="Outros">Outros</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Qtde</label>
-                            <input type="number" id="qty" min="1" value="1" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Preço (R$)</label>
-                            <input type="number" id="price" min="0" step="0.01" value="10.00" />
-                        </div>
-                        <div class="form-group">
-                            <label>Yield/Rendimento Anual (%)</label>
-                            <input type="number" id="yield" min="0" step="0.01" value="10.00" />
-                        </div>
-                        <div class="form-group" id="daysHeldGroup" style="display:none">
-                            <label>Dias de Posse (IR Regressivo)</label>
-                            <input type="number" id="daysHeld" min="1" value="721" />
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Data de Compra</label>
-                            <input type="date" id="purchaseDate" value="2024-11-12" />
-                        </div>
-                        <div class="checkbox-group" style="align-self: flex-end;">
-                            <input type="checkbox" id="irExempt" />
-                            <label for="irExempt">Provento Isento de IR</label>
-                        </div>
-                    </div>
-                    <div class="btn-group">
-                        <button id="addBtn" class="btn btn-primary">ADICIONAR ATIVO</button>
-                        <button id="updateBtn" class="btn btn-success" style="display:none">ATUALIZAR ATIVO</button>
-                        <button id="resetFormBtn" class="btn btn-secondary" onclick="resetForm()">LIMPAR FORM</button>
-                    </div>
-                </div>
-            </section>
-            <section class="card">
-                <div class="card-header">
-                    <span class="card-icon">💼</span>
-                    <h2>Carteira de Ativos</h2>
-                    <button id="presetBtn" class="btn btn-secondary" style="margin-left:auto">Exemplos</button>
-                    <button id="clearBtn" class="btn btn-icon">🧹</button>
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Investido Total</div>
-                        <div class="stat-value" id="totalInvest">R$ 0,00</div>
-                    </div>
-                    <div class="stat-card" style="border-left-color:var(--success)">
-                        <div class="stat-label">Provento Líquido Anual</div>
-                        <div class="stat-value" id="netYield">R$ 0,00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Provento Bruto Anual</div>
-                        <div class="stat-value" id="totalYield">R$ 0,00</div>
-                    </div>
-                    <div class="stat-card" style="border-left-color:var(--danger)">
-                        <div class="stat-label">IR Total Anual</div>
-                        <div class="stat-value" id="totalIR">R$ 0,00</div>
-                    </div>
-                </div>
-                <div id="categoryNetStats" class="stats-grid">
-                    </div>
-                <div class="table-container" style="margin-top:24px">
-                    <table id="assetsTable">
-                        <thead>
-                            <tr>
-                                <th>Ativo</th>
-                                <th>Cat.</th>
-                                <th class="text-right">Qtde</th>
-                                <th class="text-right">Investido</th>
-                                <th class="text-right">% Carteira</th>
-                                <th class="text-right">Yield (%)</th>
-                                <th class="text-right">Prov. Líq. Anual</th>
-                                <th class="text-right">IR</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            </tbody>
-                    </table>
-                </div>
-            </section>
-            <section class="card">
-                <div class="card-header">
-                    <span class="card-icon">💵</span>
-                    <h2>Rendas Recorrentes (Extra)</h2>
-                </div>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Tipo de Renda</label>
-                            <input type="text" id="recurrentIncomeType" value="Freelancer" placeholder="Ex: Serviços, Vendas, Aluguel..." />
-                        </div>
-                        <div class="form-group">
-                            <label>Valor (R$)</label>
-                            <input type="number" id="recurrentValue" min="0" step="10.00" value="50.00" />
-                        </div>
-                        <div class="form-group">
-                            <label>Data de Recebimento</label>
-                            <input type="date" id="recurrentDate" value="2025-11-12" />
-                        </div>
-                    </div>
-                    <div class="btn-group">
-                        <button id="addRecurrentBtn" class="btn btn-secondary">ADICIONAR RENDA</button>
-                    </div>
-                </div>
-                <h3 style="margin-top:24px; font-size:16px; font-weight:700">Histórico de Rendas</h3>
-                <div class="table-container" style="margin-top:16px">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tipo</th>
-                                <th class="text-right">Valor</th>
-                                <th class="text-right">Data</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recurrentIncomeTable">
-                            </tbody>
-                    </table>
-                </div>
-                <div style="text-align:right; margin-top:12px; font-weight:700; color:var(--text-secondary)">
-                    Total Recorrente (Aportado): <span id="totalRecurrentIncome">R$ 0,00</span>
-                </div>
-            </section>
-            <input type="file" id="importFile" accept=".csv" style="display:none" />
-        </div>
-        <aside>
-            <section class="card">
-                <div class="card-header">
-                    <span class="card-icon">🎯</span>
-                    <h2>Configuração da Simulação</h2>
-                </div>
-                <div class="form-grid">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Horizonte</label>
-                            <select id="years">
-                                <option value="1">1 ano</option>
-                                <option value="3">3 anos</option>
-                                <option value="5" selected>5 anos</option>
-                                <option value="10">10 anos</option>
-                                <option value="15">15 anos</option>
-                                <option value="20">20 anos</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Aporte Mensal (R$)</label>
-                            <input type="number" id="monthlyContribution" min="0" step="100" value="500" />
-                        </div>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="reinvest" checked />
-                        <label for="reinvest">Reinvestir proventos líquidos</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="considerInflation" />
-                        <label for="considerInflation">Considerar inflação (IPCA 4,5% a.a.)</label>
-                    </div>
-                </div>
-            </section>
-            <section class="card">
-                <div class="card-header">
-                    <span class="card-icon">💡</span>
-                    <h2>Sugestões de Investimento</h2>
-                </div>
-                <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px">
-                    Adicione exemplos para simular diferentes estratégias:
-                </p>
-                <div id="investmentSuggestions">
-                    <div class="suggestion-card">
-                        <div class="suggestion-content">
-                            <div class="suggestion-title">🏦 CDB 110% CDI</div>
-                            <div class="suggestion-desc">Renda Fixa • IR Regressivo (22.5% → 15%)</div>
-                        </div>
-                        <button class="btn btn-secondary" onclick="addExample('CDB110', 1000, 1, 'Renda Fixa', 13.5, 721)">
-                            ADICIONAR
-                        </button>
-                    </div>
-                    <div class="suggestion-card">
-                        <div class="suggestion-content">
-                            <div class="suggestion-title">📝 LCA/LCI (Isento)</div>
-                            <div class="suggestion-desc">Renda Fixa • Isento de IR</div>
-                        </div>
-                        <button class="btn btn-secondary" onclick="addExample('LCA95', 1000, 1, 'Renda Fixa', 11.8, 0, true)">
-                            ADICIONAR
-                        </button>
-                    </div>
-                    <div class="suggestion-card">
-                        <div class="suggestion-content">
-                            <div class="suggestion-title">📈 Ação PETR4</div>
-                            <div class="suggestion-desc">Ações • Provento Isento</div>
-                        </div>
-                        <button class="btn btn-secondary" onclick="addExample('PETR4', 1, 35.00, 'Ações', 12.0)">
-                            ADICIONAR
-                        </button>
-                    </div>
-                    <div class="suggestion-card">
-                        <div class="suggestion-content">
-                            <div class="suggestion-title">🏢 FII MXRF11</div>
-                            <div class="suggestion-desc">FII • Provento Isento</div>
-                        </div>
-                        <button class="btn btn-secondary" onclick="addExample('MXRF11', 1, 10.00, 'FII', 12.7)">
-                            ADICIONAR
-                        </button>
-                    </div>
-                </div>
-            </section>
-            <section class="card">
-                <div class="card-header">
-                    <span class="card-icon">💰</span>
-                    <h2>Ideias de Renda Extra</h2>
-                </div>
-                <div style="display:grid; gap:16px">
-                    <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--accent)">
-                        <div style="font-weight:700; color:var(--text); margin-bottom:4px">
-                            🎨 Gestão de Redes Sociais
-                        </div>
-                        <div style="font-size:13px; color:var(--text-muted)">
-                            Pacotes mensais para pequenos negócios
-                        </div>
-                    </div>
-                    <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--success)">
-                        <div style="font-weight:700; color:var(--text); margin-bottom:4px">
-                            📱 Afiliados + Tráfego Pago
-                        </div>
-                        <div style="font-size:13px; color:var(--text-muted)">
-                            Escale vendas com anúncios direcionados
-                        </div>
-                    </div>
-                    <div style="padding:12px; background:var(--input-bg); border-radius:8px; border-left:3px solid var(--warning)">
-                        <div style="font-weight:700; color:var(--text); margin-bottom:4px">
-                            📚 Cursos e E-books
-                        </div>
-                        <div style="font-size:13px; color:var(--text-muted)">
-                            Monetize seu conhecimento digital
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <section class="card">
-                <div class="tabs">
-                    <div class="tab active" onclick="switchTab('growth')">📊 Crescimento</div>
-                    <div class="tab" onclick="switchTab('monthly')">📅 Detalhes</div>
-                </div>
-                <div id="growth-tab" class="tab-content active">
-                    <h3 style="color:var(--text); font-size:18px; font-weight:700; margin-bottom:16px">
-                        Projeção Final (<span id="yearsDisplay">5</span> Anos)
-                    </h3>
-                    <div class="stats-grid" style="grid-template-columns:1fr 1fr">
-                        <div class="stat-card">
-                            <div class="stat-label">Patrimônio Final</div>
-                            <div class="stat-value" id="projectedNetYield">R$ 0,00</div>
-                        </div>
-                        <div class="stat-card" style="border-left-color:var(--success)">
-                            <div class="stat-label">Ganhos Totais</div>
-                            <div class="stat-value" id="projectedGrossYield">R$ 0,00</div>
-                        </div>
-                        <div class="stat-card" style="border-left-color:var(--danger)">
-                            <div class="stat-label">IR Total Pago</div>
-                            <div class="stat-value" id="projectedIRPaid">R$ 0,00</div>
-                        </div>
-                        <div class="stat-card stat-card-highlight">
-                            <div class="stat-label">Renda Passiva Mensal</div>
-                            <div class="stat-value" id="monthlyPassiveIncome">R$ 0,00</div>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="growthChart" width="450" height="280"></canvas>
-                    </div>
-                    <h3 style="color:var(--text); font-size:18px; font-weight:700; margin:24px 0 16px">
-                        Diversificação da Carteira
-                    </h3>
-                    <div class="chart-container" style="background:none; border:none; padding:0">
-                        <canvas id="pieChart" width="450" height="240"></canvas>
-                    </div>
-                    <div id="categoryBreakdown" style="margin-top:16px; padding:16px; background:var(--input-bg); border-radius:10px; font-size:13px"></div>
-                </div>
-                <div id="monthly-tab" class="tab-content">
-                    <div class="table-container" style="max-height:500px; overflow-y:auto">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Mês</th>
-                                    <th class="text-right">Patrimônio</th>
-                                    <th class="text-right">Aporte</th>
-                                    <th class="text-right">Prov. Bruto</th>
-                                    <th class="text-right">IR</th>
-                                    <th class="text-right">Prov. Líq.</th>
-                                </tr>
-                            </thead>
-                            <tbody id="monthlyProjectionBody"></tbody>
-                        </table>
-                    </div>
-                    <div id="monthlyStats" style="margin-top:16px; padding:16px; background:var(--success-light); border-radius:10px; font-size:13px; color:var(--text-secondary)"></div>
-                </div>
-            </section>
-        </aside>
-    </div>
 </body>
 </html>
 
