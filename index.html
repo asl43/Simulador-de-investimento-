@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Simulador Financeiro Pro — Rendas e Investimentos</title>
     <style>
-        /* (CSS exatamente igual ao fornecido — mantido por brevidade) */
         :root {
             --bg: #0a0e1a;
             --bg-secondary: #111827;
@@ -474,8 +473,6 @@
             </div>
         </header>
         <div class="main-grid">
-            <!-- TODO O CONTEÚDO DO MAIN-GRID FOI MANTIDO EXATAMENTE IGUAL AO ARQUIVO FORNECIDO -->
-            <!-- (Por brevidade, mantemos a estrutura, mas o script final inclui tudo) -->
             <div>
                 <section class="card">
                     <div class="card-header">
@@ -519,7 +516,7 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Data de Compra</label>
-                                <input type="date" id="purchaseDate" value="2024-11-12" />
+                                <input type="date" id="purchaseDate" value="2024-11-28" />
                             </div>
                             <div class="checkbox-group" style="align-self: flex-end;">
                                 <input type="checkbox" id="irExempt" />
@@ -559,7 +556,7 @@
                         </div>
                     </div>
                     <div id="categoryNetStats" class="stats-grid">
-                        </div>
+                    </div>
                     <div class="table-container" style="margin-top:24px">
                         <table id="assetsTable">
                             <thead>
@@ -576,7 +573,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </section>
@@ -597,7 +594,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Data de Recebimento</label>
-                                <input type="date" id="recurrentDate" value="2025-11-12" />
+                                <input type="date" id="recurrentDate" value="2025-11-28" />
                             </div>
                         </div>
                         <div class="btn-group">
@@ -616,7 +613,7 @@
                                 </tr>
                             </thead>
                             <tbody id="recurrentIncomeTable">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                     <div style="text-align:right; margin-top:12px; font-weight:700; color:var(--text-secondary)">
@@ -802,54 +799,9 @@
         </footer>
     </div>
     <script>
-        // 🔑 CONFIGURAÇÃO DA INTEGRAÇÃO COM GOOGLE SHEETS
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzkfeNxH2up1RxwZU_wGCWwO6ZciaiO8kCUEM2DuhF6c15iZEmdbfwW3-MwTYBxkF9y/exec";
+        // CONFIGURAÇÃO DO GOOGLE SHEETS
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_5gyN8HOwSZG7OmoTQ9A2yyZYEbRM5vLGxMh7q1_04Hp86s1ErDwB8MyefrGHSQLS/exec";
 
-// ✅ SALVAR NO SHEETS
-$('saveSheetsBtn').addEventListener('click', async () => {
-  try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        assets: assets,
-        rendas: recurrentIncomes
-      })
-    });
-    const result = await response.json();
-    if (result.success) {
-      alert('✅ Dados salvos no Google Sheets!');
-    } else {
-      alert('❌ Erro ao salvar: ' + (result.error || 'Desconhecido'));
-      console.error('Erro do Sheets:', result);
-    }
-  } catch (err) {
-    alert('⚠️ Falha na conexão com o Google Sheets:\n' + err.message);
-    console.error('Erro de rede:', err);
-  }
-});
-
-// ✅ CARREGAR DO SHEETS
-$('loadSheetsBtn').addEventListener('click', async () => {
-  try {
-    const response = await fetch(APPS_SCRIPT_URL);
-    const data = await response.json();
-    if (data.error) {
-      alert('❌ Erro ao carregar: ' + data.error);
-      console.error('Erro do Sheets:', data);
-      return;
-    }
-    assets = data.assets || [];
-    recurrentIncomes = data.rendas || [];
-    renderTable();
-    renderRecurrentTable();
-    alert('✅ Dados carregados do Google Sheets!');
-  } catch (err) {
-    alert('⚠️ Falha ao carregar do Google Sheets:\n' + err.message);
-    console.error('Erro de rede:', err);
-  }
-});
-        // UTILITIES
         const $ = id => document.getElementById(id);
         const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
         const formatDate = dateString => {
@@ -858,13 +810,11 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             return `${day}/${month}/${year}`;
         };
 
-        // STATE
         let assets = [];
         let recurrentIncomes = [];
         let filterCategory = '';
         let editingIndex = -1;
 
-        // DOM ELEMENTS
         const tbody = document.querySelector('#assetsTable tbody');
         const recurrentTbody = document.querySelector('#recurrentIncomeTable tbody');
         const totalInvestEl = $('totalInvest');
@@ -881,7 +831,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
         const pieCanvas = $('pieChart');
         const themeToggleBtn = $('themeToggle');
 
-        // THEME TOGGLE
         themeToggleBtn.addEventListener('click', () => {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
@@ -897,7 +846,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             $('recurrentDate').value = new Date().toISOString().split('T')[0];
         });
 
-        // IR CALCULATION
         function calculateIR(income, category, irExempt, daysHeld) {
             if (irExempt || category === 'FII' || category === 'Ações') return 0;
             let rate = 0.15;
@@ -921,7 +869,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             return recurrentIncomes.reduce((sum, r) => sum + r.value, 0);
         }
 
-        // RENDER RECURRENT TABLE
         function renderRecurrentTable() {
             recurrentTbody.innerHTML = '';
             const sortedRendas = [...recurrentIncomes].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -943,7 +890,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             runSimulation();
         }
 
-        // ADD RECURRENT INCOME
         $('addRecurrentBtn').addEventListener('click', () => {
             const type = $('recurrentIncomeType').value;
             const value = Number($('recurrentValue').value);
@@ -965,7 +911,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             }
         };
 
-        // ADD EXAMPLE ASSET
         window.addExample = function(symbol, qty, price, category, yieldPerc, daysHeld = 0, isExempt = false) {
             const finalPrice = (category === 'Renda Fixa' && symbol.includes('CDB')) ? 1.00 : Number(price);
             const finalQty = (category === 'Renda Fixa' && symbol.includes('CDB')) ? Number(qty) * price : Number(qty);
@@ -985,7 +930,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             alert(`✅ ${symbol} adicionado à carteira!`);
         };
 
-        // RENDER CATEGORY STATS
         function renderCategoryNetStats() {
             const categories = {};
             let totalNetAnnual = 0;
@@ -1040,7 +984,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             categoryNetStatsEl.innerHTML = assetHtml + externalHtml;
         }
 
-        // RENDER TABLE
         function renderTable() {
             tbody.innerHTML = '';
             const allInvest = assets.reduce((s,a)=>s+a.qty*a.price,0);
@@ -1089,7 +1032,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             runSimulation();
         }
 
-        // PROCESS ASSET
         function processAsset() {
             const symbol = $('symbol').value.trim().toUpperCase();
             const qty = $('qty').value;
@@ -1120,7 +1062,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             resetForm();
         }
 
-        // RESET FORM
         window.resetForm = function() {
             $('symbol').value='';
             $('qty').value=1;
@@ -1137,7 +1078,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             $('category').dispatchEvent(new Event('change'));
         }
 
-        // EDIT / DELETE / EVENT LISTENERS
         window.editAsset = function(index) {
             const a = assets[index];
             $('symbol').value = a.symbol;
@@ -1155,6 +1095,7 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             editingIndex = index;
             window.scrollTo(0, 0);
         };
+
         window.deleteAsset = function(index) {
             if(confirm(`Remover ${assets[index].symbol}?`)){
                 assets.splice(index, 1);
@@ -1162,6 +1103,7 @@ $('loadSheetsBtn').addEventListener('click', async () => {
                 resetForm();
             }
         };
+
         $('addBtn').addEventListener('click', processAsset);
         $('updateBtn').addEventListener('click', processAsset);
         $('resetFormBtn').addEventListener('click', resetForm);
@@ -1189,7 +1131,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             }
         });
 
-        // STORAGE (localStorage)
         function loadSaved(){
             const rawAssets = localStorage.getItem('simulator_assets');
             if(rawAssets) assets = JSON.parse(rawAssets);
@@ -1198,11 +1139,13 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             renderTable();
             renderRecurrentTable();
         }
+
         $('saveBtn').addEventListener('click', ()=>{
             localStorage.setItem('simulator_assets', JSON.stringify(assets));
             localStorage.setItem('simulator_recurrent', JSON.stringify(recurrentIncomes));
             alert('✅ Dados salvos com sucesso!');
         });
+
         $('resetStorage').addEventListener('click', ()=>{
             if(confirm('⚠️ Apagar TODOS os dados salvos (Ativos e Rendas)? Esta ação não pode ser desfeita!')){
                 localStorage.removeItem('simulator_assets');
@@ -1215,7 +1158,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             }
         });
 
-        // EXPORT / IMPORT
         $('exportBtn').addEventListener('click', ()=>{
             if(assets.length===0 && recurrentIncomes.length===0) return alert('Nenhum dado para exportar');
             let csv = 'Simulador Financeiro - Export\n';
@@ -1235,6 +1177,7 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             link.click();
             URL.revokeObjectURL(url);
         });
+
         $('importBtn').addEventListener('click', ()=> $('importFile').click());
         $('importFile').addEventListener('change', (e)=>{
             const file = e.target.files[0];
@@ -1294,14 +1237,13 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             reader.readAsText(file);
         });
 
-        // ✅ INTEGRAÇÃO COM GOOGLE SHEETS
+        // ✅ INTEGRAÇÃO COM GOOGLE SHEETS (SEM CHAVE)
         $('saveSheetsBtn').addEventListener('click', async () => {
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        key: API_KEY,
                         assets: assets,
                         rendas: recurrentIncomes
                     })
@@ -1311,19 +1253,21 @@ $('loadSheetsBtn').addEventListener('click', async () => {
                     alert('✅ Dados salvos no Google Sheets!');
                 } else {
                     alert('❌ Erro ao salvar: ' + (result.error || 'Desconhecido'));
+                    console.error('Erro Sheets:', result);
                 }
             } catch (err) {
                 alert('⚠️ Falha na conexão com o Google Sheets:\n' + err.message);
+                console.error('Erro de rede:', err);
             }
         });
 
         $('loadSheetsBtn').addEventListener('click', async () => {
             try {
-                const url = `${APPS_SCRIPT_URL}?key=${API_KEY}`;
-                const response = await fetch(url);
+                const response = await fetch(APPS_SCRIPT_URL);
                 const data = await response.json();
                 if (data.error) {
                     alert('❌ Erro ao carregar: ' + data.error);
+                    console.error('Erro Sheets:', data);
                     return;
                 }
                 assets = data.assets || [];
@@ -1333,10 +1277,10 @@ $('loadSheetsBtn').addEventListener('click', async () => {
                 alert('✅ Dados carregados do Google Sheets!');
             } catch (err) {
                 alert('⚠️ Falha ao carregar do Google Sheets:\n' + err.message);
+                console.error('Erro de rede:', err);
             }
         });
 
-        // SIMULATION & CHARTS
         function runSimulation() {
             const years = Number($('years').value);
             const months = years * 12;
@@ -1519,7 +1463,6 @@ $('loadSheetsBtn').addEventListener('click', async () => {
             });
         }
 
-        // UI TRIGGERS
         $('years').addEventListener('change', runSimulation);
         $('monthlyContribution').addEventListener('input', runSimulation);
         $('reinvest').addEventListener('change', runSimulation);
@@ -1549,3 +1492,4 @@ $('loadSheetsBtn').addEventListener('click', async () => {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </body>
 </html>
+
