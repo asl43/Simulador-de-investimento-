@@ -555,8 +555,7 @@
                             <div class="stat-value" id="totalIR">R$ 0,00</div>
                         </div>
                     </div>
-                    <div id="categoryNetStats" class="stats-grid">
-                    </div>
+                    <div id="categoryNetStats" class="stats-grid"></div>
                     <div class="table-container" style="margin-top:24px">
                         <table id="assetsTable">
                             <thead>
@@ -572,8 +571,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                 </section>
@@ -603,7 +601,7 @@
                     </div>
                     <h3 style="margin-top:24px; font-size:16px; font-weight:700">Histórico de Rendas</h3>
                     <div class="table-container" style="margin-top:16px">
-                        <table>
+                        <table id="recurrentIncomeTable">
                             <thead>
                                 <tr>
                                     <th>Tipo</th>
@@ -612,8 +610,7 @@
                                     <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="recurrentIncomeTable">
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
                     <div style="text-align:right; margin-top:12px; font-weight:700; color:var(--text-secondary)">
@@ -799,9 +796,11 @@
         </footer>
     </div>
     <script>
-        // CONFIGURAÇÃO DO GOOGLE SHEETS
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby_5gyN8HOwSZG7OmoTQ9A2yyZYEbRM5vLGxMh7q1_04Hp86s1ErDwB8MyefrGHSQLS/exec";
+        // CONFIGURAÇÃO DA INTEGRAÇÃO
+        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxVsiQXYBIX7Bk5ShQ8j7LwbA0J0bLEpHyzoqyF6ZZTwDK8-7te1afZdgEKP5PyU8t/exec";
+        const API_KEY = "minha_chave_secreta_123"; // opcional, mas mantido para compatibilidade
 
+        // UTILITIES
         const $ = id => document.getElementById(id);
         const currency = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
         const formatDate = dateString => {
@@ -810,42 +809,47 @@
             return `${day}/${month}/${year}`;
         };
 
+        // STATE
         let assets = [];
         let recurrentIncomes = [];
         let filterCategory = '';
         let editingIndex = -1;
+        let growthChartInstance = null;
+        let pieChartInstance = null; // declaradas no topo
 
-        const tbody = document.querySelector('#assetsTable tbody');
-        const recurrentTbody = document.querySelector('#recurrentIncomeTable tbody');
-        const totalInvestEl = $('totalInvest');
-        const totalYieldEl = $('totalYield');
-        const totalIREl = $('totalIR');
-        const netYieldEl = $('netYield');
-        const categoryNetStatsEl = $('categoryNetStats');
-        const projectedGrossYieldEl = $('projectedGrossYield');
-        const projectedIRPaidEl = $('projectedIRPaid');
-        const projectedNetYieldEl = $('projectedNetYield');
-        const monthlyPassiveIncomeEl = $('monthlyPassiveIncome');
-        const totalRecurrentIncomeEl = $('totalRecurrentIncome');
-        const chartCanvas = $('growthChart');
-        const pieCanvas = $('pieChart');
-        const themeToggleBtn = $('themeToggle');
+        // DOM (será inicializado após carregar o DOM)
+        let tbody, recurrentTbody, totalInvestEl, totalYieldEl, totalIREl, netYieldEl,
+            categoryNetStatsEl, projectedGrossYieldEl, projectedIRPaidEl, projectedNetYieldEl,
+            monthlyPassiveIncomeEl, totalRecurrentIncomeEl, chartCanvas, pieCanvas, themeToggleBtn;
 
-        themeToggleBtn.addEventListener('click', () => {
+        function initializeDOM() {
+            tbody = document.querySelector('#assetsTable tbody');
+            recurrentTbody = document.querySelector('#recurrentIncomeTable tbody');
+            totalInvestEl = $('totalInvest');
+            totalYieldEl = $('totalYield');
+            totalIREl = $('totalIR');
+            netYieldEl = $('netYield');
+            categoryNetStatsEl = $('categoryNetStats');
+            projectedGrossYieldEl = $('projectedGrossYield');
+            projectedIRPaidEl = $('projectedIRPaid');
+            projectedNetYieldEl = $('projectedNetYield');
+            monthlyPassiveIncomeEl = $('monthlyPassiveIncome');
+            totalRecurrentIncomeEl = $('totalRecurrentIncome');
+            chartCanvas = $('growthChart');
+            pieCanvas = $('pieChart');
+            themeToggleBtn = $('themeToggle');
+        }
+
+        // THEME TOGGLE
+        function toggleTheme() {
             const html = document.documentElement;
             const currentTheme = html.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-theme', newTheme);
             themeToggleBtn.innerHTML = newTheme === 'dark' ? '🌙 Escuro' : '☀️ Claro';
-        });
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            themeToggleBtn.innerHTML = currentTheme === 'dark' ? '🌙 Escuro' : '☀️ Claro';
-            $('purchaseDate').value = new Date().toISOString().split('T')[0];
-            $('recurrentDate').value = new Date().toISOString().split('T')[0];
-        });
-
+        // IR CALCULATION
         function calculateIR(income, category, irExempt, daysHeld) {
             if (irExempt || category === 'FII' || category === 'Ações') return 0;
             let rate = 0.15;
@@ -890,28 +894,14 @@
             runSimulation();
         }
 
-        $('addRecurrentBtn').addEventListener('click', () => {
-            const type = $('recurrentIncomeType').value;
-            const value = Number($('recurrentValue').value);
-            const date = $('recurrentDate').value;
-            if (value <= 0) return alert('O valor deve ser maior que zero.');
-            if (!date) return alert('Selecione a data de recebimento.');
-            if (!type.trim()) return alert('Preencha o tipo de renda.');
-            recurrentIncomes.push({ type, value, date });
-            renderRecurrentTable();
-            $('recurrentValue').value = '50.00';
-            $('recurrentDate').value = new Date().toISOString().split('T')[0];
-            $('recurrentIncomeType').value = 'Freelancer';
-        });
-
-        window.deleteRecurrent = function(index) {
+        function deleteRecurrent(index) {
             if (confirm('Remover este pagamento de renda?')) {
                 recurrentIncomes.splice(index, 1);
                 renderRecurrentTable();
             }
-        };
+        }
 
-        window.addExample = function(symbol, qty, price, category, yieldPerc, daysHeld = 0, isExempt = false) {
+        function addExample(symbol, qty, price, category, yieldPerc, daysHeld = 0, isExempt = false) {
             const finalPrice = (category === 'Renda Fixa' && symbol.includes('CDB')) ? 1.00 : Number(price);
             const finalQty = (category === 'Renda Fixa' && symbol.includes('CDB')) ? Number(qty) * price : Number(qty);
             const newAsset = {
@@ -928,7 +918,7 @@
             renderTable();
             runSimulation();
             alert(`✅ ${symbol} adicionado à carteira!`);
-        };
+        }
 
         function renderCategoryNetStats() {
             const categories = {};
@@ -1062,7 +1052,7 @@
             resetForm();
         }
 
-        window.resetForm = function() {
+        function resetForm() {
             $('symbol').value='';
             $('qty').value=1;
             $('price').value=10.00;
@@ -1078,7 +1068,7 @@
             $('category').dispatchEvent(new Event('change'));
         }
 
-        window.editAsset = function(index) {
+        function editAsset(index) {
             const a = assets[index];
             $('symbol').value = a.symbol;
             $('qty').value = a.qty;
@@ -1094,42 +1084,15 @@
             $('formTitle').textContent = `Editando: ${a.symbol}`;
             editingIndex = index;
             window.scrollTo(0, 0);
-        };
+        }
 
-        window.deleteAsset = function(index) {
+        function deleteAsset(index) {
             if(confirm(`Remover ${assets[index].symbol}?`)){
                 assets.splice(index, 1);
                 renderTable();
                 resetForm();
             }
-        };
-
-        $('addBtn').addEventListener('click', processAsset);
-        $('updateBtn').addEventListener('click', processAsset);
-        $('resetFormBtn').addEventListener('click', resetForm);
-        $('presetBtn').addEventListener('click', ()=>{
-            resetForm();
-            assets = [];
-            recurrentIncomes = [];
-            assets.push({symbol: 'RZAG11', qty: 2, price: 9.00, yield: 16.4, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-01'});
-            assets.push({symbol: 'MXRF11', qty: 1, price: 9.61, yield: 12.7, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-15'});
-            assets.push({symbol: 'TSLC', qty: 500, price: 1.00, yield: 12.00, category: 'Renda Fixa', irExempt: false, daysHeld: 100, purchaseDate: '2025-09-01'});
-            assets.push({symbol: 'AçãoABC', qty: 10, price: 50.00, yield: 8.00, category: 'Ações', irExempt: true, daysHeld: 0, purchaseDate: '2023-01-01'});
-            recurrentIncomes.push({ type: 'Kwai/TikTok', value: 150.00, date: '2025-10-25' });
-            recurrentIncomes.push({ type: '99Pay', value: 300.00, date: '2025-11-05' });
-            recurrentIncomes.push({ type: 'Freelancer', value: 500.00, date: '2025-11-10' });
-            renderTable();
-            renderRecurrentTable();
-            resetForm();
-            alert('✅ Exemplos adicionados com sucesso! Clique em salvar para manter os dados.');
-        });
-        $('clearBtn').addEventListener('click', ()=>{
-            if(confirm('Limpar todos os ativos da carteira?')){
-                assets = [];
-                renderTable();
-                resetForm();
-            }
-        });
+        }
 
         function loadSaved(){
             const rawAssets = localStorage.getItem('simulator_assets');
@@ -1140,13 +1103,13 @@
             renderRecurrentTable();
         }
 
-        $('saveBtn').addEventListener('click', ()=>{
+        function saveToStorage(){
             localStorage.setItem('simulator_assets', JSON.stringify(assets));
             localStorage.setItem('simulator_recurrent', JSON.stringify(recurrentIncomes));
             alert('✅ Dados salvos com sucesso!');
-        });
+        }
 
-        $('resetStorage').addEventListener('click', ()=>{
+        function resetAllStorage(){
             if(confirm('⚠️ Apagar TODOS os dados salvos (Ativos e Rendas)? Esta ação não pode ser desfeita!')){
                 localStorage.removeItem('simulator_assets');
                 localStorage.removeItem('simulator_recurrent');
@@ -1156,9 +1119,9 @@
                 renderRecurrentTable();
                 alert('✅ Dados apagados!');
             }
-        });
+        }
 
-        $('exportBtn').addEventListener('click', ()=>{
+        function exportData(){
             if(assets.length===0 && recurrentIncomes.length===0) return alert('Nenhum dado para exportar');
             let csv = 'Simulador Financeiro - Export\n';
             csv += 'Carteira de Ativos\n';
@@ -1176,10 +1139,9 @@
             link.download = 'carteira_' + new Date().toISOString().split('T')[0] + '.csv';
             link.click();
             URL.revokeObjectURL(url);
-        });
+        }
 
-        $('importBtn').addEventListener('click', ()=> $('importFile').click());
-        $('importFile').addEventListener('change', (e)=>{
+        function importData(e){
             const file = e.target.files[0];
             if(!file) return;
             const reader = new FileReader();
@@ -1235,15 +1197,16 @@
                 alert('✅ Importação concluída! Verifique a carteira.');
             };
             reader.readAsText(file);
-        });
+        }
 
-        // ✅ INTEGRAÇÃO COM GOOGLE SHEETS (SEM CHAVE)
-        $('saveSheetsBtn').addEventListener('click', async () => {
+        // ✅ INTEGRAÇÃO COM GOOGLE SHEETS
+        async function saveToSheets() {
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        key: API_KEY,
                         assets: assets,
                         rendas: recurrentIncomes
                     })
@@ -1253,21 +1216,19 @@
                     alert('✅ Dados salvos no Google Sheets!');
                 } else {
                     alert('❌ Erro ao salvar: ' + (result.error || 'Desconhecido'));
-                    console.error('Erro Sheets:', result);
                 }
             } catch (err) {
                 alert('⚠️ Falha na conexão com o Google Sheets:\n' + err.message);
-                console.error('Erro de rede:', err);
             }
-        });
+        }
 
-        $('loadSheetsBtn').addEventListener('click', async () => {
+        async function loadFromSheets() {
             try {
-                const response = await fetch(APPS_SCRIPT_URL);
+                const url = `${APPS_SCRIPT_URL}?key=${API_KEY}`;
+                const response = await fetch(url);
                 const data = await response.json();
                 if (data.error) {
                     alert('❌ Erro ao carregar: ' + data.error);
-                    console.error('Erro Sheets:', data);
                     return;
                 }
                 assets = data.assets || [];
@@ -1277,9 +1238,8 @@
                 alert('✅ Dados carregados do Google Sheets!');
             } catch (err) {
                 alert('⚠️ Falha ao carregar do Google Sheets:\n' + err.message);
-                console.error('Erro de rede:', err);
             }
-        });
+        }
 
         function runSimulation() {
             const years = Number($('years').value);
@@ -1361,8 +1321,6 @@
             drawCharts(patrimonyHistory);
         }
 
-        let growthChartInstance = null;
-        let pieChartInstance = null;
         function drawCharts(patrimonyHistory = [0]) {
             const categoryData = {};
             let totalInvested = 0;
@@ -1463,31 +1421,97 @@
             });
         }
 
-        $('years').addEventListener('change', runSimulation);
-        $('monthlyContribution').addEventListener('input', runSimulation);
-        $('reinvest').addEventListener('change', runSimulation);
-        $('considerInflation').addEventListener('change', runSimulation);
-        window.switchTab = function(tabName) {
+        function switchTab(tabName) {
             const tabs = document.querySelectorAll('.tab');
             const contents = document.querySelectorAll('.tab-content');
             tabs.forEach(t => t.classList.remove('active'));
             contents.forEach(c => c.classList.remove('active'));
             document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
             $(`${tabName}-tab`).classList.add('active');
-        };
-        $('category').addEventListener('change', function() {
-            const daysHeldGroup = $('daysHeldGroup');
-            if (this.value === 'Renda Fixa') {
-                daysHeldGroup.style.display = 'flex';
-                $('irExempt').checked = false;
-            } else {
-                daysHeldGroup.style.display = 'none';
-                $('irExempt').checked = (this.value === 'FII' || this.value === 'Ações');
-            }
+        }
+
+        // 👇 TUDO INICIALIZADO APÓS O CARREGAMENTO DO DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeDOM();
+
+            // Theme
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            themeToggleBtn.innerHTML = currentTheme === 'dark' ? '🌙 Escuro' : '☀️ Claro';
+            themeToggleBtn.addEventListener('click', toggleTheme);
+
+            // Form dates
+            $('purchaseDate').value = new Date().toISOString().split('T')[0];
+            $('recurrentDate').value = new Date().toISOString().split('T')[0];
+
+            // Event Listeners
+            $('addBtn').addEventListener('click', processAsset);
+            $('updateBtn').addEventListener('click', processAsset);
+            $('resetFormBtn').addEventListener('click', resetForm);
+            $('presetBtn').addEventListener('click', () => {
+                resetForm();
+                assets = [];
+                recurrentIncomes = [];
+                assets.push({symbol: 'RZAG11', qty: 2, price: 9.00, yield: 16.4, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-01'});
+                assets.push({symbol: 'MXRF11', qty: 1, price: 9.61, yield: 12.7, category: 'FII', irExempt: true, daysHeld: 0, purchaseDate: '2024-01-15'});
+                assets.push({symbol: 'TSLC', qty: 500, price: 1.00, yield: 12.00, category: 'Renda Fixa', irExempt: false, daysHeld: 100, purchaseDate: '2025-09-01'});
+                assets.push({symbol: 'AçãoABC', qty: 10, price: 50.00, yield: 8.00, category: 'Ações', irExempt: true, daysHeld: 0, purchaseDate: '2023-01-01'});
+                recurrentIncomes.push({ type: 'Kwai/TikTok', value: 150.00, date: '2025-10-25' });
+                recurrentIncomes.push({ type: '99Pay', value: 300.00, date: '2025-11-05' });
+                recurrentIncomes.push({ type: 'Freelancer', value: 500.00, date: '2025-11-10' });
+                renderTable();
+                renderRecurrentTable();
+                resetForm();
+                alert('✅ Exemplos adicionados com sucesso! Clique em salvar para manter os dados.');
+            });
+            $('clearBtn').addEventListener('click', () => {
+                if(confirm('Limpar todos os ativos da carteira?')){
+                    assets = [];
+                    renderTable();
+                    resetForm();
+                }
+            });
+            $('saveBtn').addEventListener('click', saveToStorage);
+            $('resetStorage').addEventListener('click', resetAllStorage);
+            $('exportBtn').addEventListener('click', exportData);
+            $('importBtn').addEventListener('click', () => $('importFile').click());
+            $('importFile').addEventListener('change', importData);
+            $('addRecurrentBtn').addEventListener('click', () => {
+                const type = $('recurrentIncomeType').value;
+                const value = Number($('recurrentValue').value);
+                const date = $('recurrentDate').value;
+                if (value <= 0) return alert('O valor deve ser maior que zero.');
+                if (!date) return alert('Selecione a data de recebimento.');
+                if (!type.trim()) return alert('Preencha o tipo de renda.');
+                recurrentIncomes.push({ type, value, date });
+                renderRecurrentTable();
+                $('recurrentValue').value = '50.00';
+                $('recurrentDate').value = new Date().toISOString().split('T')[0];
+                $('recurrentIncomeType').value = 'Freelancer';
+            });
+            $('saveSheetsBtn').addEventListener('click', saveToSheets);
+            $('loadSheetsBtn').addEventListener('click', loadFromSheets);
+
+            // UI Triggers
+            $('years').addEventListener('change', runSimulation);
+            $('monthlyContribution').addEventListener('input', runSimulation);
+            $('reinvest').addEventListener('change', runSimulation);
+            $('considerInflation').addEventListener('change', runSimulation);
+            $('category').addEventListener('change', function() {
+                const daysHeldGroup = $('daysHeldGroup');
+                if (this.value === 'Renda Fixa') {
+                    daysHeldGroup.style.display = 'flex';
+                    $('irExempt').checked = false;
+                } else {
+                    daysHeldGroup.style.display = 'none';
+                    $('irExempt').checked = (this.value === 'FII' || this.value === 'Ações');
+                }
+            });
+
+            // Inicialização
+            loadSaved();
+            runSimulation();
+            $('category').dispatchEvent(new Event('change'));
         });
-        loadSaved();
-        runSimulation();
-        $('category').dispatchEvent(new Event('change'));
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </body>
