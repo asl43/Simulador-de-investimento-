@@ -664,10 +664,7 @@
                             <canvas id="growthChart" width="450" height="300"></canvas>
                         </div>
                          <h3 style="color:var(--text); font-size:16px; font-weight:700; margin-top:20px; margin-bottom:10px">
-                             Diversificação da Carteira 
-
-[Image of a pie chart showing portfolio diversification by asset class FII Stocks Fixed Income Others]
-
+                             Diversificação da Carteira
                          </h3>
                         <div id="diversificationChartContainer" class="chart-container" style="margin-top:0; height: 350px;">
                             <canvas id="diversificationChart" width="450" height="350"></canvas>
@@ -702,18 +699,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
         // --- CONFIGURAÇÃO DE INTEGRAÇÃO COM GOOGLE SHEETS ---
-        // NOVO URL DEPLOYMENT
         const GAS_URL = "https://script.google.com/macros/s/AKfycbxoiXROXsaRYl-pQpZO3soFqSnq8EeXCPEAqSU7v7LyWxDctL5yMF2wVSf54Q3zuuYm/exec";
-        
-        // ID DA SUA PLANILHA
-        const SPREADSHEET_ID = "1wQwZ1oBzSd7_B5ELuFO312yPsuHjtqRSpJgJu6Y6Mf4"; 
         
         // --- VARIÁVEIS DE ESTADO GLOBAIS ---
         let assets = [];
         let recurrentIncomes = [];
         let editAssetId = null;
         let chartInstance = null;
-        const INFLATION_RATE = 0.045; 
+        const INFLATION_RATE = 0.045; // 4,5% a.a.
 
         // --- UTILS DE FORMATAÇÃO E CÁLCULO ---
 
@@ -771,30 +764,28 @@
             document.getElementById('loadSheetsBtn').disabled = active;
         };
         
+        // Função para formatar os dados de saída (para o Sheets)
         const formatDataForSheets = (assetList) => {
+             // O Sheets precisa de números no formato americano (ponto como decimal)
             return assetList.map(asset => ({
-                id: asset.id,
-                symbol: asset.symbol,
-                category: asset.category,
-                qty: parseInt(asset.qty),
-                // Converte para string com ponto decimal (formato Sheets/inglês)
-                price: parseFloat(asset.price).toFixed(2), 
+                ...asset,
+                price: parseFloat(asset.price).toFixed(2),
                 yield: parseFloat(asset.yield).toFixed(2),
+                qty: parseInt(asset.qty),
                 daysHeld: parseInt(asset.daysHeld),
-                purchaseDate: asset.purchaseDate,
                 irExempt: asset.irExempt ? 'Sim' : 'Não'
             }));
         };
         
+        // Função para formatar os dados de entrada (do Sheets)
         const formatDataFromSheets = (data) => {
             return data.map(row => ({
-                id: row.ID || Date.now() + Math.random(),
+                id: row.ID || Date.now() + Math.random(), // Garante um ID
                 symbol: String(row.Símbolo),
                 category: String(row.Categoria),
                 qty: parseInt(row.Quantidade || 0),
-                // Garante que a leitura do float funcione, mesmo com , ou .
-                price: parseFloat(String(row.Preço).replace(',', '.') || 0), 
-                yield: parseFloat(String(row['Yield Anual']).replace(',', '.') || 0),
+                price: parseFloat(String(row.Preço).replace(',', '.').replace(/[^\d.]/g, '') || 0),
+                yield: parseFloat(String(row['Yield Anual']).replace(',', '.').replace(/[^\d.]/g, '') || 0),
                 daysHeld: parseInt(row['Dias de Posse'] || 0),
                 purchaseDate: String(row['Data Compra'] || ''),
                 irExempt: String(row['Isento IR']).toLowerCase().includes('sim')
@@ -826,17 +817,12 @@
                 if (result.status === 'success') {
                     showStatus('✅ Dados salvos no Google Sheets com sucesso!', 'success');
                 } else {
-                    // Adiciona a instrução do CORS se houver um erro de CORS/rede
-                    if (result.message && result.message.includes("Error: Request failed")) {
-                         showStatus(`❌ Erro ao salvar no Sheets: Verifique a configuração CORS ou a URL.`, 'error');
-                    } else {
-                         showStatus(`❌ Erro ao salvar no Sheets: ${result.message || 'Erro desconhecido.'}`, 'error');
-                    }
+                    showStatus(`❌ Erro ao salvar no Sheets: ${result.message || 'Erro desconhecido.'}`, 'error');
                 }
 
             } catch (error) {
                 console.error('Erro de requisição ao GAS:', error);
-                showStatus('❌ Erro de conexão com o Google Sheets. Verifique o URL e as permissões de acesso do Apps Script (Para: Qualquer Pessoa).', 'error');
+                showStatus('❌ Erro de conexão com o Google Sheets.', 'error');
             } finally {
                 setSpinner(false);
             }
@@ -859,7 +845,7 @@
                     
                     if (loadedAssets.length > 0) {
                         assets = loadedAssets;
-                        saveData();
+                        saveData(); // Salva no Local Storage após carregar
                         updateAll();
                         showStatus(`✅ ${loadedAssets.length} ativos carregados do Google Sheets.`, 'success');
                     } else {
@@ -867,16 +853,12 @@
                     }
                     
                 } else {
-                     if (result.message && result.message.includes("Error: Request failed")) {
-                         showStatus(`❌ Erro ao carregar do Sheets: Verifique a configuração CORS ou a URL.`, 'error');
-                    } else {
-                        showStatus(`❌ Erro ao carregar do Sheets: ${result.message || 'Verifique se o Apps Script está configurado.'}`, 'error');
-                    }
+                    showStatus(`❌ Erro ao carregar do Sheets: ${result.message || 'Verifique se o Apps Script está configurado.'}`, 'error');
                 }
 
             } catch (error) {
                 console.error('Erro de requisição ao GAS:', error);
-                showStatus('❌ Erro de conexão com o Google Sheets. Verifique o URL e as permissões de acesso do Apps Script (Para: Qualquer Pessoa).', 'error');
+                showStatus('❌ Erro de conexão com o Google Sheets.', 'error');
             } finally {
                 setSpinner(false);
             }
@@ -901,7 +883,8 @@
             localStorage.setItem('financial_simulator_incomes', JSON.stringify(recurrentIncomes));
         };
 
-        // --- CÁLCULOS DA CARTEIRA ATUAL ---
+        // --- CÁLCULOS DA CARTEIRA ATUAL (mantidos) ---
+
         const calculateCurrentPortfolioStats = () => {
             let totalInvest = 0;
             let totalYield = 0;
@@ -940,7 +923,7 @@
             };
         };
 
-        // --- RENDERIZAÇÃO DA INTERFACE ---
+        // --- RENDERIZAÇÃO DA INTERFACE (mantidos) ---
 
         const renderAssetsTable = (stats) => {
             const tbody = document.getElementById('assetsTable').querySelector('tbody');
@@ -1041,7 +1024,7 @@
             }
         };
 
-        // --- LÓGICA DA SIMULAÇÃO ---
+        // --- LÓGICA DA SIMULAÇÃO (mantidos) ---
 
         const runSimulation = (stats) => {
             const years = parseInt(document.getElementById('years').value);
@@ -1106,7 +1089,7 @@
             renderDiversificationChart(stats.categoryTotals, stats.totalInvest);
         };
         
-        // --- LÓGICA DO GRÁFICO ---
+        // --- LÓGICA DO GRÁFICO (mantidos) ---
 
         const renderGrowthChart = (labels, data) => {
             if (chartInstance) {
@@ -1161,16 +1144,6 @@
                     }
                 }
             });
-             if (data && data.length > 1) {
-                const growthChartContainer = document.getElementById('growth-tab');
-                // Simples verificação para exibir um gráfico de crescimento representativo
-                 if (data[data.length - 1] > data[0] * 1.5) {
-                    growthChartContainer.insertAdjacentHTML('afterbegin', '<div style="text-align:center; margin-bottom:10px;">
-
-[Image of a financial growth chart showing exponential increase over 5 years]
-</div>');
-                }
-            }
         };
         
          const renderDiversificationChart = (categoryTotals, totalInvest) => {
@@ -1183,10 +1156,10 @@
             const data = labels.map(label => categoryTotals[label]);
             
             let colors = { 
-                'FII': '#10b981', 
-                'Ações': '#f59e0b', 
-                'Renda Fixa': '#06b6d4', 
-                'Outros': '#ef4444' 
+                'FII': '#10b981', // Success
+                'Ações': '#f59e0b', // Warning
+                'Renda Fixa': '#06b6d4', // Accent
+                'Outros': '#ef4444' // Danger
             };
             const backgroundColors = labels.map(label => colors[label] || '#94a3b8');
 
@@ -1248,7 +1221,7 @@
             });
         };
 
-        // --- FUNÇÕES DE CRUD ---
+        // --- FUNÇÕES DE CRUD (mantidos) ---
 
         window.addOrUpdateAsset = () => {
             const symbol = document.getElementById('symbol').value.trim();
@@ -1406,11 +1379,13 @@
             runSimulation(stats);
         };
 
-        // --- EVENT LISTENERS E FUNÇÕES AUXILIARES ---
+        // --- EVENT LISTENERS E FUNÇÕES AUXILIARES (mantidos e ajustados) ---
         
+        // --- NOVO: LIGAÇÃO DOS BOTÕES DO SHEETS ---
         document.getElementById('saveSheetsBtn').addEventListener('click', window.saveToSheets);
         document.getElementById('loadSheetsBtn').addEventListener('click', window.loadFromSheets);
         
+        // --- LIGAÇÃO DOS BOTÕES EXISTENTES ---
         document.getElementById('addBtn').addEventListener('click', addOrUpdateAsset);
         document.getElementById('updateBtn').addEventListener('click', addOrUpdateAsset);
         document.getElementById('clearBtn').addEventListener('click', () => {
@@ -1486,7 +1461,7 @@
             }
         };
 
-        // --- FUNÇÕES DE IMPORT / EXPORT ---
+        // --- FUNÇÕES DE IMPORT / EXPORT (mantidos) ---
         
         document.getElementById('exportBtn').addEventListener('click', () => {
             const headers = ["ID", "Símbolo", "Categoria", "Qtde", "Preço", "Yield", "Dias de Posse", "Data Compra", "Isento IR"];
